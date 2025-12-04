@@ -17,7 +17,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     >
       <div className="flex items-center gap-2">
         <div className="text-2xl font-bold tracking-tight">
-          <span style={{ color: "#F8EEDF" }}>centaverse</span>
+          <span style={{ color: "#F8EEDF" }}>centaver</span>
           <span style={{ color: "#8E1616" }}>se</span>
         </div>
       </div>
