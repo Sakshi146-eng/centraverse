@@ -56,6 +56,11 @@
 "use client"
 
 import { useState } from "react"
+import { Instrument_Sans, Krub, Space_Mono } from 'next/font/google'
+
+const instrumentSans = Instrument_Sans({ subsets: ['latin'] })
+const krub = Krub({ weight: ['400', '700'], subsets: ['latin'] })
+const spaceMono = Space_Mono({ weight: ['400', '700'], subsets: ['latin'] })
 
 export default function HeroSection() {
   const [hoveredWord, setHoveredWord] = useState<string | null>(null)
@@ -64,7 +69,7 @@ export default function HeroSection() {
     <div className="w-full min-h-screen flex items-center justify-center px-4 md:px-8">
       <div className="max-w-5xl text-center">
         {/* Main Heading */}
-        <h1 className="text-6xl md:text-7xl leading-tight mb-6" style={{ fontFamily: "'Catchy Mager'", fontWeight: "bold" }}>
+        <h1 className={`text-6xl md:text-7xl leading-tight mb-6 ${instrumentSans.className}`} style={{ fontWeight: "bold" }}>
           <span
             className="inline-block cursor-pointer transition-colors duration-300"
             style={{ color: hoveredWord === "hello" ? "#8E1616" : "#F8EEDF" }}
@@ -73,7 +78,7 @@ export default function HeroSection() {
           >
             Hello
           </span>
-          <span style={{ color: "#E8C999" }}> | </span>
+          <span style={{ color: "#8E1616" }}> | </span>
           <span
             className="inline-block cursor-pointer transition-colors duration-300"
             style={{ color: hoveredWord === "namaskara" ? "#8E1616" : "#F8EEDF" }}
@@ -82,7 +87,7 @@ export default function HeroSection() {
           >
             ನಮಸ್ಕಾರ
           </span>
-          <span style={{ color: "#E8C999" }}> | </span>
+          <span style={{ color: "#8E1616" }}> | </span>
           <span
             className="inline-block cursor-pointer transition-colors duration-300"
             style={{ color: hoveredWord === "namaste" ? "#8E1616" : "#F8EEDF" }}
@@ -94,12 +99,12 @@ export default function HeroSection() {
         </h1>
 
         {/* Name */}
-        <h2 className="text-3xl md:text-5xl mb-8" style={{ fontFamily: "'Avant Garde Gothic Bold'", fontWeight: "bold", color: "#E8C999" }}>
+        <h2 className={`text-3xl md:text-5xl mb-8 ${krub.className}`} style={{ fontWeight: "bold", color: "#F8EEDF" }}>
           I'm Shreyas Shetty
         </h2>
 
         {/* Description */}
-        <p className="text-base md:text-xl leading-relaxed max-w-3xl mx-auto mb-12" style={{ fontFamily: "'Avant Garde Gothic Bold'", color: "#F8EEDF", letterSpacing: "0.3px" }}>
+        <p className={`text-base md:text-xl leading-relaxed max-w-3xl mx-auto mb-12 ${spaceMono.className}`} style={{ color: "#F8EEDF", letterSpacing: "0.3px" }}>
           A professional photographer and video editor with over 7 years of experience in crafting impactful visuals. I bring stories to life through dynamic edits, creative compositions and clean aesthetics. I'm also a growing graphic designer and logo creator, constantly exploring new ways to add personality and identity to brands.
         </p>
 

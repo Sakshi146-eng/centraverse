@@ -31,12 +31,13 @@ export default function MainLayout() {
         <section id="home" className="min-h-screen pt-20">
           <HeroSection />
         </section>
-        <section id="edits" className="min-h-screen">
-          <EditsSection />
-        </section>
         <section id="about" className="min-h-screen">
           <AboutSection />
         </section>
+        <section id="edits" className="min-h-screen">
+          <EditsSection />
+        </section>
+        
         <section id="contact" className="min-h-screen">
           <ContactSection onNavigate={scrollToSection} />
         </section>
