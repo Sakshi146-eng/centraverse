@@ -6,19 +6,28 @@ import MainLayout from "@/components/main-layout"
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // Show splash for 4 seconds then transition to main content
-    const timer = setTimeout(() => {
-      setShowSplash(false)
-    }, 4000)
-
-    return () => clearTimeout(timer)
+    setMounted(true)
+    const t = setTimeout(() => setShowSplash(false), 2600)
+    return () => clearTimeout(t)
   }, [])
 
-  if (showSplash) {
-    return <SplashScreen />
-  }
+  if (!mounted) return null
 
-  return <MainLayout />
+  return (
+    <>
+      {showSplash && <SplashScreen />}
+      <div
+        style={{
+          opacity: showSplash ? 0 : 1,
+          transition: "opacity 0.6s ease",
+          pointerEvents: showSplash ? "none" : "auto",
+        }}
+      >
+        <MainLayout />
+      </div>
+    </>
+  )
 }

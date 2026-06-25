@@ -1,71 +1,193 @@
 "use client"
 
-import { Mail, Instagram, Linkedin } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { ArrowUpRight } from "lucide-react"
 
 interface ContactSectionProps {
   onNavigate?: (section: string) => void
 }
 
+const socials = [
+  { num: "01", label: "Email", handle: "shreyas@centraverse.com", href: "mailto:shreyas@centraverse.com" },
+  { num: "02", label: "Instagram", handle: "@centraverse", href: "#" },
+  { num: "03", label: "YouTube", handle: "Centraverse", href: "#" },
+  { num: "04", label: "LinkedIn", handle: "Shreyas Shetty", href: "#" },
+]
+
 export default function ContactSection({ onNavigate }: ContactSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [form, setForm] = useState({ name: "", email: "", message: "" })
+  const [sent, setSent] = useState(false)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            el.querySelectorAll(".reveal").forEach((child, i) => {
+              setTimeout(() => child.classList.add("in-view"), i * 80)
+            })
+            obs.disconnect()
+          }
+        })
+      },
+      { threshold: 0.05 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setSent(true)
+    setForm({ name: "", email: "", message: "" })
+    setTimeout(() => setSent(false), 3500)
+  }
+
   return (
-    <div className="w-full px-4 md:px-8 py-20">
-      <h2 className="text-5xl md:text-6xl font-bold text-center mb-12" style={{ color: "#F8EEDF" }}>
-        Get in
-        <span style={{ color: "#8E1616" }}> Touch</span>
-      </h2>
+    <section ref={sectionRef} id="contact" className="section" style={{ paddingTop: "0" }}>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "4rem" }}>
+        <p className="section-label reveal">Get in Touch</p>
 
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-lg mb-8 font-light" style={{ color: "#E8C999" }}>
-            Have a project in mind? Let's create something amazing together.
-          </p>
-
-          <a
-            href="mailto:shreyas@centraverse.com"
-            className="inline-block px-8 py-4 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 mb-8"
-            style={{
-              backgroundColor: "#8E1616",
-              color: "#F8EEDF",
-            }}
+        {/* Large background text — ameer.com style */}
+        <div style={{ overflow: "hidden", marginBottom: "3rem" }}>
+          <h2
+            className="contact-big reveal reveal-delay-1"
+            style={{ marginBottom: 0 }}
           >
-            Send Me an Email
-          </a>
+            Contact
+          </h2>
         </div>
 
-        <div className="flex justify-center gap-8">
-          {[
-            { icon: Mail, label: "Email", href: "mailto:shreyas@centraverse.com" },
-            { icon: Instagram, label: "Instagram", href: "#" },
-            { icon: Linkedin, label: "LinkedIn", href: "#" },
-          ].map(({ icon: Icon, label, href }) => (
-            <a
-              key={label}
-              href={href}
-              className="p-4 rounded-full transition-all hover:scale-110"
+        <div className="contact-grid">
+          {/* Socials — ameer.com footer layout */}
+          <div>
+            <p
+              className="reveal reveal-delay-1"
               style={{
-                backgroundColor: "rgba(142, 22, 22, 0.2)",
-                color: "#8E1616",
-                border: "2px solid rgba(142, 22, 22, 0.4)",
+                fontFamily: "var(--font-dm-mono, monospace)",
+                fontSize: "0.7rem",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.3)",
+                marginBottom: "0.5rem",
               }}
-              title={label}
             >
-              <Icon size={24} />
-            </a>
-          ))}
+              Connect directly
+            </p>
+
+            <ul className="social-list reveal reveal-delay-2">
+              {socials.map((s) => (
+                <li key={s.num}>
+                  <a className="social-item" href={s.href}>
+                    <div className="social-item-left">
+                      <span className="social-num">{s.num}</span>
+                      <span className="social-name">{s.label}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                      <span className="social-handle">{s.handle}</span>
+                      <ArrowUpRight size={12} className="social-arrow" style={{ color: "rgba(255,255,255,0.4)" }} />
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact form */}
+          <div className="reveal reveal-delay-3">
+            <p
+              style={{
+                fontFamily: "var(--font-dm-mono, monospace)",
+                fontSize: "0.7rem",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.3)",
+                marginBottom: "1.5rem",
+              }}
+            >
+              Send a message
+            </p>
+
+            {sent ? (
+              <div
+                style={{
+                  padding: "2.5rem",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  textAlign: "center",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "var(--font-dm-mono, monospace)",
+                    fontSize: "0.8rem",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "rgba(255,255,255,0.5)",
+                  }}
+                >
+                  Message sent — I'll be in touch.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label className="form-label">Name</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    required
+                    placeholder="Your name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Email</label>
+                  <input
+                    className="form-control"
+                    type="email"
+                    required
+                    placeholder="your@email.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Message</label>
+                  <textarea
+                    className="form-control"
+                    required
+                    placeholder="Tell me about your project..."
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  />
+                </div>
+                <button type="submit" className="btn-submit">
+                  Send
+                  <ArrowUpRight size={15} />
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
-        <div
-          className="mt-16 p-8 rounded-2xl text-center"
-          style={{
-            backgroundColor: "rgba(142, 22, 22, 0.1)",
-            borderLeft: "4px solid #8E1616",
-          }}
-        >
-          <p className="font-light text-sm" style={{ color: "#E8C999" }}>
-            © 2025 Centraverse Media. All rights reserved.
-          </p>
-        </div>
+        {/* Footer */}
+        <footer className="site-footer" style={{ marginTop: "5rem", padding: "2rem 0", marginLeft: 0, marginRight: 0 }}>
+          <span className="footer-copy">
+            © 2025 centraverse — All rights reserved
+          </span>
+          <a
+            href="#home"
+            className="back-top"
+            onClick={(e) => { e.preventDefault(); onNavigate?.("home") }}
+          >
+            Back to top ↑
+          </a>
+        </footer>
       </div>
-    </div>
+    </section>
   )
 }

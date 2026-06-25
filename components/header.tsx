@@ -1,47 +1,99 @@
 "use client"
 
-import { Menu } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Menu, X } from "lucide-react"
+
+const navItems = [
+  { id: "home", label: "Home" },
+  { id: "about", label: "About" },
+  { id: "edits", label: "Edits" },
+  { id: "contact", label: "Contact" },
+]
 
 interface HeaderProps {
-  onMenuClick: () => void
+  activeSection: string
+  onNavigate: (section: string) => void
 }
 
-export default function Header({ onMenuClick }: HeaderProps) {
+export default function Header({ activeSection, onNavigate }: HeaderProps) {
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  const handleNav = (id: string) => {
+    onNavigate(id)
+    setMenuOpen(false)
+  }
+
   return (
-    <header
-      className="fixed top-0 left-0 right-0 z-40 px-6 py-4 flex justify-between items-center backdrop-blur-md"
-      style={{
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        borderBottom: "1px solid rgba(232, 201, 153, 0.1)",
-      }}
-    >
-      <div className="flex items-center gap-2">
-        <div className="text-2xl font-bold tracking-tight">
-          <span style={{ color: "#F8EEDF" }}>centaver</span>
-          <span style={{ color: "#8E1616" }}>se</span>
-        </div>
-      </div>
+    <>
+      <nav className={`site-nav ${scrolled ? "scrolled" : ""}`}>
+        {/* Logo */}
+        <button
+          onClick={() => handleNav("home")}
+          className="nav-logo"
+          style={{ background: "none", border: "none", cursor: "none" }}
+        >
+          centraverse<span className="dot" />
+        </button>
 
-      <button
-        onClick={onMenuClick}
-        className="md:hidden p-2 hover:opacity-70 transition-opacity"
-        style={{ color: "#8E1616" }}
-      >
-        <Menu size={28} />
-      </button>
+        {/* Desktop links */}
+        <ul className="nav-links" style={{ display: "flex" }}>
+          {navItems.map((item) => (
+            <li key={item.id} style={{ listStyle: "none" }}>
+              <a
+                href={`#${item.id}`}
+                className={activeSection === item.id ? "active" : ""}
+                onClick={(e) => { e.preventDefault(); handleNav(item.id) }}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
 
-      <nav className="hidden md:flex gap-8">
-        {["Edits", "About", "Contact"].map((item) => (
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{
+            display: "none",
+            background: "none",
+            border: "none",
+            color: "#fff",
+            cursor: "none",
+            padding: "0.25rem",
+          }}
+          className="mobile-toggle"
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </nav>
+
+      {/* Mobile full-screen menu */}
+      <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
+        {navItems.map((item) => (
           <a
-            key={item}
-            href={`#${item.toLowerCase()}`}
-            className="text-sm font-medium hover:opacity-70 transition-opacity"
-            style={{ color: "#E8C999" }}
+            key={item.id}
+            href={`#${item.id}`}
+            onClick={(e) => { e.preventDefault(); handleNav(item.id) }}
           >
-            {item}
+            {item.label}
           </a>
         ))}
-      </nav>
-    </header>
+      </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .nav-links { display: none !important; }
+          .mobile-toggle { display: flex !important; }
+        }
+      `}</style>
+    </>
   )
 }
