@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, DM_Mono, Bebas_Neue } from "next/font/google"
+import { Inter, DM_Mono, Bebas_Neue, Montserrat } from "next/font/google"
 import "./globals.css"
 
 const inter = Inter({
@@ -20,6 +20,13 @@ const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-bebas",
+  display: "swap",
+})
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  variable: "--font-montserrat",
   display: "swap",
 })
 
@@ -49,14 +56,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${dmMono.variable} ${bebasNeue.variable}`}
+      className={`${inter.variable} ${dmMono.variable} ${bebasNeue.variable} ${montserrat.variable}`}
       style={{
         "--font-display": "var(--font-bebas)",
         "--font-body": "var(--font-inter)",
         "--font-mono": "var(--font-dm-mono)",
       } as React.CSSProperties}
     >
-      <body style={{ background: "#0a0a0a", color: "#fff" }}>
+      <body className="antialiased">
         {children}
       </body>
     </html>

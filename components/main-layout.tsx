@@ -1,16 +1,19 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Header from "@/components/header"
 import HeroSection from "@/components/hero-section"
 import AboutSection from "@/components/about-section"
 import EditsSection from "@/components/edits-section"
+import StickyCardsSection from "@/components/sticky-cards-section"
+import CircularGallerySection from "@/components/circular-gallery-section"
+import SmoothSliderSection from "@/components/smooth-slider-section"
 import ContactSection from "@/components/contact-section"
 
-export default function MainLayout() {
+export default function MainLayout({ splashDone }: { splashDone: boolean }) {
   const [activeSection, setActiveSection] = useState("home")
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
   const [isHover, setIsHover] = useState(false)
+  const cursorRef = useRef<HTMLDivElement>(null)
 
   const scrollToSection = useCallback((sectionId: string) => {
     setActiveSection(sectionId)
@@ -20,15 +23,30 @@ export default function MainLayout() {
 
   // Custom cursor
   useEffect(() => {
+    const cursor = cursorRef.current
+    if (!cursor) return
+
     const onMove = (e: MouseEvent) => {
-      setCursorPos({ x: e.clientX, y: e.clientY })
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`
     }
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement
       setIsHover(
-        !!(t.tagName === "A" || t.tagName === "BUTTON" || t.closest("a") || t.closest("button"))
+        !!(
+          t.tagName === "A" ||
+          t.tagName === "BUTTON" ||
+          t.closest("a") ||
+          t.closest("button") ||
+          t.closest(".gallery-card") ||
+          t.closest(".smooth-slide-container") ||
+          t.closest(".smooth-slider-items p")
+        )
       )
     }
+
+    // Initialize cursor off-screen
+    cursor.style.transform = "translate3d(-100px, -100px, 0) translate(-50%, -50%)"
+
     window.addEventListener("mousemove", onMove)
     document.addEventListener("mouseover", onOver)
     return () => {
@@ -36,6 +54,45 @@ export default function MainLayout() {
       document.removeEventListener("mouseover", onOver)
     }
   }, [])
+
+  // Global scroll reveal IntersectionObserver + MutationObserver for dynamic elements
+  useEffect(() => {
+    if (!splashDone) return
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view")
+            obs.unobserve(entry.target)
+          }
+        })
+      },
+      {
+        root: null,
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    )
+
+    const observeReveals = () => {
+      document.querySelectorAll(".reveal:not(.in-view)").forEach((el) => {
+        obs.observe(el)
+      })
+    }
+
+    observeReveals()
+
+    const mut = new MutationObserver(() => {
+      observeReveals()
+    })
+    mut.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      obs.disconnect()
+      mut.disconnect()
+    }
+  }, [splashDone])
 
   // Section observer
   useEffect(() => {
@@ -54,11 +111,11 @@ export default function MainLayout() {
   }, [])
 
   return (
-    <div style={{ background: "#0a0a0a", color: "#fff", minHeight: "100vh" }}>
+    <div className="main-bg-container" style={{ color: "var(--white)", minHeight: "100vh" }}>
       {/* Custom cursor */}
       <div
+        ref={cursorRef}
         className={`cursor ${isHover ? "hover" : ""}`}
-        style={{ left: cursorPos.x, top: cursorPos.y }}
       />
 
       <Header activeSection={activeSection} onNavigate={scrollToSection} />
@@ -72,6 +129,15 @@ export default function MainLayout() {
         </section>
         <section id="edits">
           <EditsSection />
+        </section>
+        <section id="sticky-cards">
+          <StickyCardsSection />
+        </section>
+        <section id="circular-gallery">
+          <CircularGallerySection />
+        </section>
+        <section id="smooth-slider">
+          <SmoothSliderSection />
         </section>
         <section id="contact">
           <ContactSection onNavigate={scrollToSection} />

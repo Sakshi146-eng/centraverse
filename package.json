@@ -2,6 +2,22 @@
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
+  "description": "",
+  "homepage": "https://github.com/Sakshi146-eng/centraverse#readme",
+  "bugs": {
+    "url": "https://github.com/Sakshi146-eng/centraverse/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sakshi146-eng/centraverse.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "build": "next build",
     "dev": "next dev",
@@ -44,9 +60,10 @@
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.5.1",
+    "gsap": "^3.15.0",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
-    "next": "16.0.7",
+    "next": "^16.2.9",
     "next-themes": "^0.4.6",
     "react": "19.2.0",
     "react-day-picker": "9.8.0",

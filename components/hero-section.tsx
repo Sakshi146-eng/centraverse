@@ -37,7 +37,7 @@ export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) =
           ))}
           <br />
           {surname.split("").map((ch, i) => (
-            <span key={i} data-char style={{ transitionDelay: `${(name.length + i) * 0.06}s`, color: "rgba(255,255,255,0.18)" }}>
+             <span key={i} data-char style={{ transitionDelay: `${(name.length + i) * 0.06}s`, color: "rgba(0,0,0,0.18)" }}>
               {ch}
             </span>
           ))}
@@ -45,7 +45,7 @@ export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) =
       </div>
 
       {/* Sub row */}
-      <div className="hero-sub-row">
+      <div className="hero-sub-row reveal reveal-delay-4">
         <p className="hero-role">
           Video Editor &amp; Visual Storyteller
         </p>
@@ -62,7 +62,7 @@ export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) =
       </div>
 
       {/* Marquee strip */}
-      <div className="marquee-wrapper" style={{ margin: "0 -2.5rem", marginTop: "3rem" }}>
+      <div className="marquee-wrapper reveal reveal-delay-5" style={{ margin: "0 -2.5rem", marginTop: "3rem" }}>
         <div className="marquee-track">
           {[...marqueeItems, ...marqueeItems].map((item, i) => (
             <span key={i} className="marquee-item">

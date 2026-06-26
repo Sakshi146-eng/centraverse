@@ -1,32 +1,32 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import SplashScreen from "@/components/splash-screen"
 import MainLayout from "@/components/main-layout"
 
 export default function Home() {
-  const [showSplash, setShowSplash] = useState(true)
+  const [splashDone, setSplashDone] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-    const t = setTimeout(() => setShowSplash(false), 2600)
-    return () => clearTimeout(t)
+  useEffect(() => { setMounted(true) }, [])
+
+  const handleDone = useCallback(() => {
+    setSplashDone(true)
   }, [])
 
   if (!mounted) return null
 
   return (
     <>
-      {showSplash && <SplashScreen />}
+      {!splashDone && <SplashScreen onDone={handleDone} />}
       <div
         style={{
-          opacity: showSplash ? 0 : 1,
-          transition: "opacity 0.6s ease",
-          pointerEvents: showSplash ? "none" : "auto",
+          opacity: splashDone ? 1 : 0,
+          transition: "opacity 0.5s ease 0.1s",
+          pointerEvents: splashDone ? "auto" : "none",
         }}
       >
-        <MainLayout />
+        <MainLayout splashDone={splashDone} />
       </div>
     </>
   )

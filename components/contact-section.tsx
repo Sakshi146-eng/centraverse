@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { ArrowUpRight } from "lucide-react"
 
 interface ContactSectionProps {
@@ -15,29 +13,8 @@ const socials = [
 ]
 
 export default function ContactSection({ onNavigate }: ContactSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null)
   const [form, setForm] = useState({ name: "", email: "", message: "" })
   const [sent, setSent] = useState(false)
-
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            el.querySelectorAll(".reveal").forEach((child, i) => {
-              setTimeout(() => child.classList.add("in-view"), i * 80)
-            })
-            obs.disconnect()
-          }
-        })
-      },
-      { threshold: 0.05 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,8 +24,8 @@ export default function ContactSection({ onNavigate }: ContactSectionProps) {
   }
 
   return (
-    <section ref={sectionRef} id="contact" className="section" style={{ paddingTop: "0" }}>
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "4rem" }}>
+    <section id="contact" className="section" style={{ paddingTop: "0" }}>
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "4rem" }}>
         <p className="section-label reveal">Get in Touch</p>
 
         {/* Large background text — ameer.com style */}
@@ -71,7 +48,7 @@ export default function ContactSection({ onNavigate }: ContactSectionProps) {
                 fontSize: "0.7rem",
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
-                color: "rgba(255,255,255,0.3)",
+                color: "var(--muted)",
                 marginBottom: "0.5rem",
               }}
             >
@@ -88,7 +65,7 @@ export default function ContactSection({ onNavigate }: ContactSectionProps) {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                       <span className="social-handle">{s.handle}</span>
-                      <ArrowUpRight size={12} className="social-arrow" style={{ color: "rgba(255,255,255,0.4)" }} />
+                      <ArrowUpRight size={12} className="social-arrow" style={{ color: "var(--muted)" }} />
                     </div>
                   </a>
                 </li>
@@ -104,7 +81,7 @@ export default function ContactSection({ onNavigate }: ContactSectionProps) {
                 fontSize: "0.7rem",
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
-                color: "rgba(255,255,255,0.3)",
+                color: "var(--muted)",
                 marginBottom: "1.5rem",
               }}
             >
@@ -115,7 +92,7 @@ export default function ContactSection({ onNavigate }: ContactSectionProps) {
               <div
                 style={{
                   padding: "2.5rem",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  border: "1px solid var(--border)",
                   textAlign: "center",
                 }}
               >
@@ -125,7 +102,7 @@ export default function ContactSection({ onNavigate }: ContactSectionProps) {
                     fontSize: "0.8rem",
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",
-                    color: "rgba(255,255,255,0.5)",
+                    color: "var(--off-white)",
                   }}
                 >
                   Message sent — I'll be in touch.

@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { Plus } from "lucide-react"
 
 type Category = "all" | "cinematic" | "reels" | "brand" | "motion"
@@ -21,8 +19,8 @@ const edits: Edit[] = [
     title: "golden hour",
     category: "cinematic",
     duration: "2:34",
-    bgColor: "#1a1208",
-    patternColor: "rgba(255,200,80,0.12)",
+    bgColor: "#1e1510",
+    patternColor: "rgba(255,100,30,0.18)",
     description: "A cinematic short capturing golden hour in urban landscapes.",
   },
   {
@@ -30,8 +28,8 @@ const edits: Edit[] = [
     title: "brand reel",
     category: "brand",
     duration: "0:45",
-    bgColor: "#0e0e14",
-    patternColor: "rgba(120,100,255,0.1)",
+    bgColor: "#1a1a22",
+    patternColor: "rgba(255,60,0,0.12)",
     description: "Crisp, stylish brand reel with fast cuts and smooth transitions.",
   },
   {
@@ -39,8 +37,8 @@ const edits: Edit[] = [
     title: "motion type",
     category: "motion",
     duration: "1:10",
-    bgColor: "#100a0a",
-    patternColor: "rgba(255,80,80,0.08)",
+    bgColor: "#1c1010",
+    patternColor: "rgba(255,51,0,0.14)",
     description: "Kinetic typography animation for a music release.",
   },
   {
@@ -48,8 +46,8 @@ const edits: Edit[] = [
     title: "monsoon vibes",
     category: "reels",
     duration: "0:30",
-    bgColor: "#080f12",
-    patternColor: "rgba(60,180,255,0.08)",
+    bgColor: "#101618",
+    patternColor: "rgba(255,80,20,0.1)",
     description: "Ambient monsoon reel with slow-motion sequences.",
   },
   {
@@ -57,8 +55,8 @@ const edits: Edit[] = [
     title: "documentary",
     category: "cinematic",
     duration: "5:20",
-    bgColor: "#0a0a0a",
-    patternColor: "rgba(200,200,200,0.05)",
+    bgColor: "#181818",
+    patternColor: "rgba(255,51,0,0.08)",
     description: "A short documentary-style piece exploring everyday life.",
   },
   {
@@ -66,8 +64,8 @@ const edits: Edit[] = [
     title: "logo reveal",
     category: "motion",
     duration: "0:08",
-    bgColor: "#08100a",
-    patternColor: "rgba(200,255,0,0.08)",
+    bgColor: "#141414",
+    patternColor: "rgba(255,102,0,0.12)",
     description: "Animated logo reveal for Centraverse with sound.",
   },
 ]
@@ -120,7 +118,6 @@ function EditThumbnail({ edit }: { edit: Edit }) {
         textAnchor="middle"
         fontFamily="monospace"
         letterSpacing="3"
-        textTransform="uppercase"
       >
         PLACEHOLDER · ADD VIDEO
       </text>
@@ -134,7 +131,6 @@ function EditThumbnail({ edit }: { edit: Edit }) {
 }
 
 export default function EditsSection() {
-  const sectionRef = useRef<HTMLElement>(null)
   const [activeCategory, setActiveCategory] = useState<Category>("all")
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
@@ -142,29 +138,9 @@ export default function EditsSection() {
     ? edits
     : edits.filter((e) => e.category === activeCategory)
 
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            el.querySelectorAll(".reveal").forEach((child, i) => {
-              setTimeout(() => child.classList.add("in-view"), i * 60)
-            })
-            obs.disconnect()
-          }
-        })
-      },
-      { threshold: 0.05 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
   return (
-    <section ref={sectionRef} id="edits" className="section" style={{ paddingTop: "0" }}>
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "4rem" }}>
+    <section id="edits" className="section" style={{ paddingTop: "0" }}>
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "4rem" }}>
         <p className="section-label reveal">Selected Work</p>
 
         {/* Header row with filter */}
@@ -198,8 +174,8 @@ export default function EditsSection() {
                   letterSpacing: "0.1em",
                   cursor: "none",
                   color: activeCategory === cat.id
-                    ? "var(--accent, #c8ff00)"
-                    : "rgba(255,255,255,0.35)",
+                    ? "#ff3300"
+                    : "var(--muted)",
                   transition: "color 0.2s ease",
                   textTransform: "lowercase",
                   textDecoration: activeCategory === cat.id ? "underline" : "none",

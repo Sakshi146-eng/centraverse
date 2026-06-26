@@ -1,6 +1,4 @@
-"use client"
 
-import { useEffect, useRef } from "react"
 
 const tools = ["CapCut", "Adobe Premiere Pro", "After Effects", "Photoshop", "Illustrator"]
 
@@ -13,30 +11,8 @@ const meta = [
 ]
 
 export default function AboutSection() {
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            el.querySelectorAll(".reveal").forEach((child, i) => {
-              setTimeout(() => child.classList.add("in-view"), i * 80)
-            })
-            obs.disconnect()
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
   return (
-    <section ref={sectionRef} id="about" className="section">
+    <section id="about" className="section">
       <p className="section-label reveal">About</p>
 
       <h2 className="section-title reveal reveal-delay-1">
@@ -68,11 +44,11 @@ export default function AboutSection() {
                 style={{
                   display: "inline-block",
                   padding: "0.3rem 0.75rem",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  border: "1px solid var(--border)",
                   fontFamily: "var(--font-dm-mono, monospace)",
                   fontSize: "0.68rem",
                   letterSpacing: "0.08em",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "var(--muted)",
                   textTransform: "uppercase",
                 }}
               >
