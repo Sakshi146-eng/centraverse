@@ -69,3 +69,8 @@ firebase-debug.log
 # Misc
 dist-*/
 /.env.local
+
+# Package backups and npm lockfiles
+package.jsonb
+package-lock.json
+pakage-lock.json
