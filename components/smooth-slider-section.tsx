@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { CustomEase } from "gsap/CustomEase"
 
@@ -17,6 +17,7 @@ const sliderContent: SlideItem[] = [
   { name: "Calm Drift", img: "/slider/img5.jpg" },
   { name: "Subtle Balance", img: "/slider/img6.jpg" },
   { name: "Soft Whisper", img: "/slider/img7.jpg" },
+  { name: "Event", img: "/card-img-1.jpg" },
 ]
 
 export default function SmoothSliderSection() {
@@ -28,14 +29,27 @@ export default function SmoothSliderSection() {
 
   const activeSlideIndex = useRef(1)
   const isAnimating = useRef(false)
-  const totalSlides = 7
+  const totalSlides = 8
+
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 900)
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   const clipPath = {
     closed: "polygon(25% 30%, 75% 30%, 75% 70%, 25% 70%)",
     open: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
   }
 
-  const slidePositions = {
+  const slidePositions = isMobile ? {
+    prev: { left: "0%", rotation: -90 },
+    active: { left: "50%", rotation: 0 },
+    next: { left: "100%", rotation: 90 },
+  } : {
     prev: { left: "15%", rotation: -90 },
     active: { left: "50%", rotation: 0 },
     next: { left: "85%", rotation: 90 },
@@ -114,8 +128,6 @@ export default function SmoothSliderSection() {
         item.classList.toggle("activeItem", i === index - 1)
       })
     }
-
-
 
     const animateSlide = (slide: HTMLElement, props: { left: string; rotation: number; clipPath?: string }) => {
       gsap.to(slide, { ...props, duration: 2, ease: "hop" })
@@ -258,15 +270,21 @@ export default function SmoothSliderSection() {
         item.removeEventListener("click", handler)
       })
     }
-  }, [clipPath, slidePositions])
+  }, [isMobile])
 
   return (
-    <div ref={sectionRef} className="smooth-slider-section">
+    <div ref={sectionRef} className="smooth-slider-section" style={{ position: "relative", marginTop: "8rem", marginBottom: "4rem" }}>
+      <div style={{ position: "absolute", top: "0rem", left: "5%", zIndex: 10, pointerEvents: "none" }}>
+        <p className="section-label reveal">Graphic Design</p>
+        <h2 className="section-title reveal reveal-delay-1" style={{ marginTop: "1rem" }}>
+          Posters
+        </h2>
+      </div>
       <div ref={sliderRef} className="smooth-slider">
-        {/* Slide 7 (Prev) */}
+        {/* Slide 8 (Prev) */}
         <div className="smooth-slide-container prev">
           <div className="smooth-slide-img">
-            <img src={sliderContent[6].img} alt={sliderContent[6].name} />
+            <img src={sliderContent[7].img} alt={sliderContent[7].name} />
           </div>
         </div>
 

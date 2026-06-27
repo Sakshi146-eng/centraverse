@@ -1,170 +1,758 @@
-import { useState } from "react"
-import { ArrowUpRight } from "lucide-react"
+'use client';
 
-interface ContactSectionProps {
-  onNavigate?: (section: string) => void
-}
+import { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from 'framer-motion';
+import Image from 'next/image';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ArrowUpRight, X, Mail, Instagram, Youtube, Linkedin } from 'lucide-react';
+import { ContactCanvas } from './contact-canvas';
 
-const socials = [
-  { num: "01", label: "Email", handle: "shreyas@centraverse.com", href: "mailto:shreyas@centraverse.com" },
-  { num: "02", label: "Instagram", handle: "@centraverse", href: "#" },
-  { num: "03", label: "YouTube", handle: "Centraverse", href: "#" },
-  { num: "04", label: "LinkedIn", handle: "Shreyas Shetty", href: "#" },
-]
+gsap.registerPlugin(ScrollTrigger);
 
-export default function ContactSection({ onNavigate }: ContactSectionProps) {
-  const [form, setForm] = useState({ name: "", email: "", message: "" })
-  const [sent, setSent] = useState(false)
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSent(true)
-    setForm({ name: "", email: "", message: "" })
-    setTimeout(() => setSent(false), 3500)
-  }
+const SOCIALS = [
+  { label: 'Email', href: 'mailto:mediapvtcentraverse.com@gmail.com', icon: <Mail size={15} /> },
+  { label: 'Instagram', href: '#', icon: <Instagram size={15} /> },
+  { label: 'YouTube', href: '#', icon: <Youtube size={15} /> },
+  { label: 'LinkedIn', href: '#', icon: <Linkedin size={15} /> },
+];
+
+/* ── Magnetic CTA button ──────────────────────────────────────────────────── */
+function MagneticCTA({
+  label,
+  onClick,
+  variant = 'outline',
+}: {
+  label: string;
+  onClick: () => void;
+  variant?: 'outline' | 'solid';
+}) {
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const x = useSpring(rawX, { stiffness: 280, damping: 26 });
+  const y = useSpring(rawY, { stiffness: 280, damping: 26 });
+
+  const solid = variant === 'solid';
 
   return (
-    <section id="contact" className="section" style={{ paddingTop: "0" }}>
-      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "4rem" }}>
-        <p className="section-label reveal">Get in Touch</p>
+    <motion.button
+      style={{ x, y }}
+      onClick={onClick}
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        rawX.set((e.clientX - r.left - r.width / 2) * 0.3);
+        rawY.set((e.clientY - r.top - r.height / 2) * 0.3);
+      }}
+      onMouseLeave={() => { rawX.set(0); rawY.set(0); }}
+      className={
+        solid
+          ? 'group inline-flex items-center gap-3 bg-white text-black px-8 py-4 hover:bg-white/85 transition-colors duration-300 rounded-full'
+          : 'group inline-flex items-center gap-3 border border-white/20 px-8 py-4 text-white/60 hover:text-white hover:border-white/50 transition-colors duration-300 rounded-full'
+      }
+      whileHover={!solid ? { backgroundColor: 'rgba(255,255,255,0.04)' } : undefined}
+    >
+      <span
+        className="text-[0.65rem] tracking-[0.22em] uppercase font-medium"
+        style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+      >
+        {label}
+      </span>
+      <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+    </motion.button>
+  );
+}
 
-        {/* Large background text — ameer.com style */}
-        <div style={{ overflow: "hidden", marginBottom: "3rem" }}>
-          <h2
-            className="contact-big reveal reveal-delay-1"
-            style={{ marginBottom: 0 }}
-          >
-            Contact
-          </h2>
+/* ── Validation ───────────────────────────────────────────────────────────── */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type FormState = { name: string; email: string; message: string };
+type FieldErrors = Record<keyof FormState, string>;
+
+function getErrors(f: FormState): FieldErrors {
+  return {
+    name: f.name.trim().length < 2 ? 'Please enter your name.' : '',
+    email: !EMAIL_RE.test(f.email.trim()) ? 'Enter a valid email address.' : '',
+    message: f.message.trim().length < 10 ? 'A little more detail helps (10+ characters).' : '',
+  };
+}
+
+/* ── Contact modal ────────────────────────────────────────────────────────── */
+function ContactModal({ intent, onClose }: { intent: 'message' | 'call'; onClose: () => void }) {
+  const [form, setForm] = useState<FormState>({
+    name: '',
+    email: '',
+    message: intent === 'call' ? 'I’d like to book a quick call to discuss a project. My availability / timezone is: ' : '',
+  });
+  const [touched, setTouched] = useState({ name: false, email: false, message: false });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  const errors = getErrors(form);
+  const isValid = !errors.name && !errors.email && !errors.message;
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isValid) {
+      setTouched({ name: true, email: true, message: true });
+      return;
+    }
+    setStatus('sending');
+    // Simulate sending delay
+    setTimeout(() => {
+      setStatus('sent');
+    }, 1500);
+  };
+
+  const fieldClass = (hasError: boolean) =>
+    `w-full bg-transparent border ${hasError ? 'border-red-400/50 focus:border-red-400/70' : 'border-white/12 focus:border-white/40'} text-white placeholder:text-white/30 px-5 py-3.5 text-sm focus:outline-none transition-colors duration-200`;
+
+  const errorClass =
+    'text-[0.58rem] tracking-[0.04em] text-red-400/70 mt-1.5 block';
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[999999] flex items-end sm:items-center justify-center p-0 sm:p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      {/* Backdrop */}
+      <motion.div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+
+      {/* Panel */}
+      <motion.div
+        className="relative w-full sm:max-w-xl bg-[#0d0d0d] border border-white/10 overflow-hidden rounded-t-2xl sm:rounded-2xl"
+        initial={{ y: '100%', opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: '100%', opacity: 0 }}
+        transition={{ duration: 0.55, ease: EASE }}
+      >
+        {/* Corner accents */}
+        <div className="absolute top-0 right-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-px h-12 bg-white/20" />
+          <div className="absolute top-0 right-0 w-12 h-px bg-white/20" />
+        </div>
+        <div className="absolute bottom-0 left-0 pointer-events-none">
+          <div className="absolute bottom-0 left-0 w-px h-12 bg-white/10" />
+          <div className="absolute bottom-0 left-0 w-12 h-px bg-white/10" />
         </div>
 
-        <div className="contact-grid">
-          {/* Socials — ameer.com footer layout */}
-          <div>
-            <p
-              className="reveal reveal-delay-1"
-              style={{
-                fontFamily: "var(--font-dm-mono, monospace)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "var(--muted)",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Connect directly
-            </p>
-
-            <ul className="social-list reveal reveal-delay-2">
-              {socials.map((s) => (
-                <li key={s.num}>
-                  <a className="social-item" href={s.href}>
-                    <div className="social-item-left">
-                      <span className="social-num">{s.num}</span>
-                      <span className="social-name">{s.label}</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                      <span className="social-handle">{s.handle}</span>
-                      <ArrowUpRight size={12} className="social-arrow" style={{ color: "var(--muted)" }} />
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact form */}
-          <div className="reveal reveal-delay-3">
-            <p
-              style={{
-                fontFamily: "var(--font-dm-mono, monospace)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "var(--muted)",
-                marginBottom: "1.5rem",
-              }}
-            >
-              Send a message
-            </p>
-
-            {sent ? (
-              <div
+        <div className="p-8 sm:p-10">
+          {/* Header */}
+          <div className="flex items-start justify-between mb-8">
+            <div>
+              <span
+                className="text-[0.55rem] tracking-[0.28em] uppercase text-white/40 font-medium block mb-2"
+                style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+              >
+                {intent === 'call' ? 'Book a Call' : 'Get in Touch'}
+              </span>
+              <h2
+                className="font-black text-white tracking-[-0.035em] leading-tight"
                 style={{
-                  padding: "2.5rem",
-                  border: "1px solid var(--border)",
-                  textAlign: "center",
+                  fontFamily: 'Satoshi, system-ui, sans-serif',
+                  fontWeight: 900,
+                  fontSize: 'clamp(1.6rem, 4vw, 2.2rem)',
+                  textTransform: 'uppercase',
                 }}
               >
-                <p
+                {intent === 'call' ? 'Let’s' : 'Start a'}{' '}
+                <span
                   style={{
-                    fontFamily: "var(--font-dm-mono, monospace)",
-                    fontSize: "0.8rem",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "var(--off-white)",
+                    fontStyle: 'italic',
+                    fontWeight: 900,
+                    color: 'rgba(255,255,255,0.4)',
                   }}
                 >
-                  Message sent — I'll be in touch.
+                  {intent === 'call' ? 'talk' : 'conversation'}
+                </span>
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-9 h-9 border border-white/12 flex items-center justify-center text-white/50 hover:text-white hover:border-white/35 transition-colors duration-200 shrink-0 mt-1 rounded-full"
+            >
+              <X size={14} />
+            </button>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {status === 'sent' ? (
+              <motion.div
+                key="sent"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="py-12 text-center"
+              >
+                <div className="w-12 h-px bg-white/20 mx-auto mb-8" />
+                <p
+                  className="text-white/70 leading-relaxed mb-2 uppercase"
+                  style={{
+                    fontFamily: 'var(--font-instrument), Georgia, serif',
+                    fontStyle: 'italic',
+                    fontWeight: 900,
+                    fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+                  }}
+                >
+                  Message received.
                 </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label className="form-label">Name</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    required
-                    placeholder="Your name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Email</label>
-                  <input
-                    className="form-control"
-                    type="email"
-                    required
-                    placeholder="your@email.com"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Message</label>
-                  <textarea
-                    className="form-control"
-                    required
-                    placeholder="Tell me about your project..."
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  />
-                </div>
-                <button type="submit" className="btn-submit">
-                  Send
-                  <ArrowUpRight size={15} />
+                <p
+                  className="text-white/50 text-sm"
+                  style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                >
+                  I&apos;ll be in touch soon.
+                </p>
+                <button
+                  onClick={onClose}
+                  className="mt-8 text-[0.6rem] tracking-[0.2em] uppercase text-white/40 hover:text-white transition-colors"
+                  style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                >
+                  Close
                 </button>
-              </form>
+              </motion.div>
+            ) : (
+              <motion.form
+                key="form"
+                onSubmit={handleSubmit}
+                className="space-y-4"
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      className="block text-[0.58rem] tracking-[0.18em] uppercase text-white/40 mb-2 font-medium"
+                      style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                      onBlur={() => setTouched((p) => ({ ...p, name: true }))}
+                      className={fieldClass(touched.name && !!errors.name)}
+                      style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                      placeholder="Your name"
+                      aria-invalid={touched.name && !!errors.name}
+                    />
+                    {touched.name && errors.name && (
+                      <span className={errorClass} style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}>{errors.name}</span>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      className="block text-[0.58rem] tracking-[0.18em] uppercase text-white/40 mb-2 font-medium"
+                      style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                      onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                      className={fieldClass(touched.email && !!errors.email)}
+                      style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                      placeholder="your@email.com"
+                      aria-invalid={touched.email && !!errors.email}
+                    />
+                    {touched.email && errors.email && (
+                      <span className={errorClass} style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}>{errors.email}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    className="block text-[0.58rem] tracking-[0.18em] uppercase text-white/40 mb-2 font-medium"
+                    style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    rows={5}
+                    value={form.message}
+                    onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
+                    onBlur={() => setTouched((p) => ({ ...p, message: true }))}
+                    className={`${fieldClass(touched.message && !!errors.message)} resize-none`}
+                    style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                    placeholder="Tell me about your project..."
+                    aria-invalid={touched.message && !!errors.message}
+                  />
+                  {touched.message && errors.message && (
+                    <span className={errorClass} style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}>{errors.message}</span>
+                  )}
+                </div>
+
+                {status === 'error' && (
+                  <p
+                    className="text-[0.6rem] tracking-[0.12em] text-red-400/70 font-medium"
+                    style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                  >
+                    Something went wrong — please try again or email directly.
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={status === 'sending' || !isValid}
+                  className="w-full bg-white text-black py-4 text-[0.62rem] tracking-[0.22em] uppercase font-semibold hover:bg-white/88 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed mt-2 rounded-lg"
+                  style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                >
+                  {status === 'sending' ? 'Sending...' : intent === 'call' ? 'Request Call' : 'Send Message'}
+                </button>
+              </motion.form>
             )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ── Main section ─────────────────────────────────────────────────────────── */
+interface ContactProps {
+  onNavigate?: (sectionId: string) => void;
+}
+
+export default function ContactSection({ onNavigate }: ContactProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const emailRef = useRef<HTMLHeadingElement>(null);
+  const wordmarkRef = useRef<HTMLDivElement>(null);
+  const sectionInView = useInView(sectionRef, { once: true, margin: '-12%' });
+
+  const [form, setForm] = useState<FormState>({ name: '', email: '', message: '' });
+  const [touched, setTouched] = useState({ name: false, email: false, message: false });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  const errors = getErrors(form);
+  const isValid = !errors.name && !errors.email && !errors.message;
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isValid) {
+      setTouched({ name: true, email: true, message: true });
+      return;
+    }
+    setStatus('sending');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      if (response.ok) {
+        setStatus('sent');
+      } else {
+        setStatus('error');
+      }
+    } catch (error) {
+      console.error('Submission failed:', error);
+      setStatus('error');
+    }
+  };
+
+  const fieldClass = (hasError: boolean) =>
+    `w-full bg-transparent border ${hasError ? 'border-red-400/50 focus:border-red-400/70' : 'border-white/12 focus:border-white/40'} text-white placeholder:text-white/30 px-5 py-3.5 text-sm focus:outline-none transition-colors duration-200`;
+
+  const errorClass = 'text-[0.58rem] tracking-[0.04em] text-red-400/70 mt-1.5 block';
+
+
+  /* ── CENTRAVERSE wordmark animation (Custom manual split) ── */
+  const wordmarkText = "CENTRAVERSE";
+
+  useEffect(() => {
+    const el = wordmarkRef.current;
+    if (!el) return;
+
+    let glitchTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const ctx = gsap.context(() => {
+      const chars = el.querySelectorAll('.glitch-char');
+
+      gsap.set(chars, {
+        color: 'rgba(255,255,255,0)',
+        y: -40,
+        skewX: () => (Math.random() - 0.5) * 10,
+      });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: 'top bottom', // fire as soon as any part enters viewport
+          toggleActions: 'play none none none',
+        },
+      });
+
+      /* 1 — fly in with a bright flash */
+      tl.to(chars, {
+        color: 'rgba(255,255,255,0.4)',
+        y: 0,
+        skewX: 0,
+        duration: 1.6,
+        stagger: { amount: 0.55, from: 'random' },
+        ease: 'expo.out',
+      });
+
+      /* 2 — settle to the original ghost opacity */
+      tl.to(chars, {
+        color: 'rgba(255,255,255,0.06)',
+        duration: 2,
+        stagger: { amount: 0.4 },
+        ease: 'power2.inOut',
+      }, '-=0.7');
+
+      /* 3 — continuous idle float */
+      chars.forEach((char, i) => {
+        gsap.to(char, {
+          y: `${2 + Math.sin(i * 0.9) * 3}px`,
+          duration: 3.5 + i * 0.2,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: i * 0.09,
+        });
+      });
+
+      /* 4 — periodic glitch on a random character */
+      const scheduleGlitch = (delay = 4200) => {
+        glitchTimer = setTimeout(() => {
+          if (!chars.length) return;
+          const i = Math.floor(Math.random() * chars.length);
+          gsap.timeline()
+            .to(chars[i], { color: 'rgba(255,255,255,0.4)', x: 3, skewX: 7, duration: 0.055 })
+            .to(chars[i], { color: 'rgba(255,255,255,0.02)', x: -2, skewX: -5, duration: 0.055 })
+            .to(chars[i], { color: 'rgba(255,255,255,0.06)', x: 0, skewX: 0, duration: 0.1 });
+          scheduleGlitch(1500 + Math.random() * 3000);
+        }, delay);
+      };
+      scheduleGlitch();
+    }, el);
+
+    return () => {
+      clearTimeout(glitchTimer);
+      ctx.revert();
+    };
+  }, []);
+
+  /* ── Heading SplitText animation ── */
+  const emailText = "CONTACT";
+  useEffect(() => {
+    if (!sectionRef.current || !emailRef.current) return;
+    const ctx = gsap.context(() => {
+      const chars = emailRef.current!.querySelectorAll('.email-char');
+      gsap.fromTo(
+        chars,
+        { y: 48, opacity: 0 },
+        {
+          y: 0, opacity: 1,
+          duration: 1.1,
+          stagger: 0.022,
+          ease: 'power4.out',
+          scrollTrigger: { trigger: emailRef.current, start: 'top 80%' },
+        }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <>
+      <section
+        ref={sectionRef}
+        id="contact"
+        className="w-full bg-[#0A0A0A] relative overflow-hidden text-white"
+        style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
+      >
+        {/* Constellation background */}
+        <div className="absolute inset-0 pointer-events-none z-0" aria-hidden>
+          <ContactCanvas />
+        </div>
+
+        <div className="relative z-10 w-full max-w-[1600px] mx-auto px-[clamp(1.25rem,5vw,5rem)] pt-[clamp(5rem,10vw,11rem)] pb-0 flex-1 flex flex-col">
+
+          {/* Section label */}
+          <div className="flex items-center gap-4 mb-[clamp(3rem,6vw,8rem)]">
+            <motion.span
+              className="text-[0.6rem] tracking-[0.22em] uppercase text-white/40 font-medium shrink-0"
+              style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+              initial={{ opacity: 0, x: -16 }}
+              animate={sectionInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, ease: EASE }}
+            >
+              Get in Touch
+            </motion.span>
+            <motion.div
+              className="flex-1 h-px bg-white/20"
+              initial={{ scaleX: 0, transformOrigin: 'left' }}
+              animate={sectionInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 1.4, delay: 0.15, ease: EASE }}
+            />
+          </div>
+
+
+          {/* Main Layout: Title + Form on left, Info on right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 mb-0 w-full">
+            {/* Left side: Title & Form */}
+            <div className="w-full">
+              <div className="overflow-hidden mb-12">
+                <h2
+                  ref={emailRef}
+                  className="tracking-[-0.01em] leading-[0.9] uppercase inline-flex flex-wrap"
+                  style={{
+                    color: '#f5f5f5',
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 400,
+                    fontSize: 'clamp(3rem, 8vw, 8rem)'
+                  }}
+                >
+                  {emailText.split("").map((char, i) => (
+                    <span key={i} className="email-char" style={{ display: 'inline-block' }}>
+                      {char === " " ? " " : char}
+                    </span>
+                  ))}
+                </h2>
+                <motion.p
+                  className="text-[0.6rem] tracking-[0.22em] uppercase text-white/40 font-medium mt-4"
+                  style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={sectionInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
+                >
+                  Send a message
+                </motion.p>
+              </div>
+
+              <motion.div
+                className="max-w-xl"
+                initial={{ opacity: 0, y: 10 }}
+                animate={sectionInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
+              >
+                <AnimatePresence mode="wait">
+                  {status === 'sent' ? (
+                    <motion.div
+                      key="sent"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="py-12"
+                    >
+                      <div className="w-12 h-px bg-white/20 mb-8" />
+                      <p
+                        className="text-white/70 leading-relaxed mb-2 uppercase"
+                        style={{
+                          fontFamily: 'var(--font-instrument), Georgia, serif',
+                          fontStyle: 'italic',
+                          fontWeight: 900,
+                          fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+                        }}
+                      >
+                        Message received.
+                      </p>
+                      <p
+                        className="text-white/50 text-sm"
+                        style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                      >
+                        I'll be in touch soon.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.form
+                      key="form"
+                      onSubmit={handleSubmit}
+                      className="space-y-4"
+                      initial={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[0.58rem] tracking-[0.18em] uppercase text-white/40 mb-2 font-medium" style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}>Name</label>
+                          <input
+                            type="text"
+                            value={form.name}
+                            onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                            onBlur={() => setTouched((p) => ({ ...p, name: true }))}
+                            className={fieldClass(touched.name && !!errors.name)}
+                            style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                            placeholder="Your name"
+                          />
+                          {touched.name && errors.name && <span className={errorClass}>{errors.name}</span>}
+                        </div>
+                        <div>
+                          <label className="block text-[0.58rem] tracking-[0.18em] uppercase text-white/40 mb-2 font-medium" style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}>Email</label>
+                          <input
+                            type="email"
+                            value={form.email}
+                            onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                            onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                            className={fieldClass(touched.email && !!errors.email)}
+                            style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                            placeholder="your@email.com"
+                          />
+                          {touched.email && errors.email && <span className={errorClass}>{errors.email}</span>}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[0.58rem] tracking-[0.18em] uppercase text-white/40 mb-2 font-medium" style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}>Message</label>
+                        <textarea
+                          rows={5}
+                          value={form.message}
+                          onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
+                          onBlur={() => setTouched((p) => ({ ...p, message: true }))}
+                          className={`${fieldClass(touched.message && !!errors.message)} resize-none`}
+                          style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                          placeholder="Tell me about your project..."
+                        />
+                        {touched.message && errors.message && <span className={errorClass}>{errors.message}</span>}
+                      </div>
+                      {status === 'error' && (
+                        <p className="text-[0.6rem] tracking-[0.12em] text-red-400/70 font-medium" style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}>
+                          Something went wrong — please try again or email directly.
+                        </p>
+                      )}
+                      <button
+                        type="submit"
+                        disabled={status === 'sending' || !isValid}
+                        className="w-full sm:w-auto px-8 bg-white text-black py-4 text-[0.62rem] tracking-[0.22em] uppercase font-semibold hover:bg-white/88 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed mt-2 rounded-lg"
+                        style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                      >
+                        {status === 'sending' ? 'Sending...' : 'Send Message'}
+                      </button>
+                      <div className="mt-0 -mb-32 overflow-hidden">
+                        <Image
+                          src="/logo3.png"
+                          alt="Centraverse Logo"
+                          width={300}
+                          height={300}
+                          className="w-auto h-64 opacity-100 object-cover scale-[1.75] origin-left"
+                        />
+                      </div>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </div>
+
+            {/* Right side: Info strip */}
+            <motion.div
+              className="flex flex-col justify-center gap-16 lg:pl-20 lg:border-l lg:border-white/10"
+              initial={{ opacity: 0 }}
+              animate={sectionInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.6, delay: 0.55, ease: EASE }}
+            >
+              {[
+                { label: 'Location', value: 'Remote · Worldwide' },
+                { label: 'Response', value: 'Within 24 hours' },
+                { label: 'Status', value: 'Available for projects', pulse: true },
+              ].map((item) => (
+                <div key={item.label} className="flex flex-col items-center text-center">
+                  <p
+                    className="text-[0.55rem] tracking-[0.22em] uppercase text-white/40 font-medium mb-2"
+                    style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                  >
+                    {item.label}
+                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    {item.pulse && <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse shrink-0" />}
+                    <p
+                      className="text-white/80 font-medium"
+                      style={{
+                        fontFamily: 'Satoshi, system-ui, sans-serif',
+                        fontSize: 'clamp(0.85rem, 1.3vw, 1rem)',
+                      }}
+                    >
+                      {item.value}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="site-footer" style={{ marginTop: "5rem", padding: "2rem 0", marginLeft: 0, marginRight: 0 }}>
-          <span className="footer-copy">
-            © 2025 centraverse — All rights reserved
-          </span>
-          <a
-            href="#home"
-            className="back-top"
-            onClick={(e) => { e.preventDefault(); onNavigate?.("home") }}
-          >
-            Back to top ↑
-          </a>
+        {/* ── Footer ──────────────────────────────────────────────────────── */}
+        <footer className="mt-0 relative z-10 overflow-hidden w-full">
+
+          {/* Big background wordmark removed */}
+
+          <div className="relative z-10 max-w-[1600px] mx-auto px-[clamp(1.25rem,5vw,5rem)] pb-[clamp(3rem,5vw,5rem)] pt-0">
+
+            {/* Top row: socials */}
+            <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-end gap-6 sm:gap-8 mb-10 sm:mb-12">
+              {/* Socials */}
+              <motion.div
+                className="flex flex-col items-center sm:items-end gap-3"
+                initial={{ opacity: 0 }}
+                animate={sectionInView ? { opacity: 1 } : {}}
+                transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
+              >
+                <span
+                  className="text-[0.6rem] tracking-[0.22em] uppercase text-white/40 font-medium"
+                  style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+                >
+                  Connect Directly
+                </span>
+                <div className="flex items-center justify-center gap-3">
+                  {SOCIALS.map(({ label, href, icon }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-all duration-200 hover:scale-110"
+                    >
+                      {icon}
+                    </a>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+
+            {/* Bottom bar */}
+            <motion.div
+              className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 border-t border-white/20 pt-8"
+              initial={{ opacity: 0 }}
+              animate={sectionInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.85, ease: EASE }}
+            >
+              <p
+                className="text-[0.55rem] tracking-[0.16em] uppercase text-white/40 font-medium text-center sm:text-left"
+                style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+              >
+                © 2026 Shreyas Shetty · Centraverse
+              </p>
+              <a
+                href="#home"
+                onClick={(e) => { e.preventDefault(); if (onNavigate) onNavigate('home'); }}
+                className="text-[0.55rem] tracking-[0.14em] uppercase text-white/40 hover:text-white transition-colors text-center sm:text-right"
+                style={{ fontFamily: 'Satoshi, system-ui, sans-serif' }}
+              >
+                Back to top ↑
+              </a>
+            </motion.div>
+          </div>
         </footer>
-      </div>
-    </section>
-  )
+      </section>
+
+
+    </>
+  );
 }

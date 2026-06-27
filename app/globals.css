@@ -3,29 +3,55 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Satoshi Variable ─────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: italic;
+}
+
 /* ========================= */
 /*   DESIGN TOKENS           */
 /* ========================= */
 :root {
   /* ── Backgrounds (matte warm off-white) ── */
-  --bg: #f5f5f3;              /* warm off-white concrete texture */
-  --bg-card: #ebebea;         /* slightly darker off-white card surface */
-  --bg-deep: #e2e2e0;         /* deeper gray-off-white for overlays / footer */
+  --bg: #f5f5f3;
+  /* warm off-white concrete texture */
+  --bg-card: #ebebea;
+  /* slightly darker off-white card surface */
+  --bg-deep: #e2e2e0;
+  /* deeper gray-off-white for overlays / footer */
   --bg-overlay: rgba(245, 245, 243, 0.94);
 
   /* ── Text (Black typographic color scheme) ── */
-  --white: #000000;           /* pure black for headings, titles, logo */
-  --off-white: #1c1c1c;       /* dark warm charcoal for body paragraphs and values */
-  --muted: rgba(0, 0, 0, 0.6); /* semi-transparent black for secondary labels */
-  --very-muted: rgba(0, 0, 0, 0.35); /* transparent black for input placeholders */
+  --white: #000000;
+  /* pure black for headings, titles, logo */
+  --off-white: #1c1c1c;
+  /* dark warm charcoal for body paragraphs and values */
+  --muted: rgba(0, 0, 0, 0.6);
+  /* semi-transparent black for secondary labels */
+  --very-muted: rgba(0, 0, 0, 0.35);
+  /* transparent black for input placeholders */
 
   /* ── Borders ── */
   --border: rgba(0, 0, 0, 0.12);
   --border-hover: rgba(0, 0, 0, 0.25);
 
   /* ── Accent (image: vivid orange-red flame gradient) ── */
-  --accent: #ff3300;           /* bold orange-red — primary accent */
-  --accent-warm: #ff6600;      /* softer warm orange */
+  --accent: #ff3300;
+  /* bold orange-red — primary accent */
+  --accent-warm: #ff6600;
+  /* softer warm orange */
   --accent-dim: rgba(255, 51, 0, 0.12);
   --accent-glow: rgba(255, 51, 0, 0.25);
 
@@ -55,7 +81,11 @@
 /*   BASE                    */
 /* ========================= */
 @layer base {
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
   html {
     scroll-behavior: smooth;
@@ -64,7 +94,14 @@
     font-size: 16px;
   }
 
-  html, body, .main-bg-container, .hero, .section, .site-footer, .circular-gallery-section, .smooth-slider-section {
+  html,
+  body,
+  .main-bg-container,
+  .hero,
+  .section,
+  .site-footer,
+  .circular-gallery-section,
+  .smooth-slider-section {
     background-color: var(--bg) !important;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E") !important;
     background-attachment: fixed !important;
@@ -82,36 +119,44 @@
     color: #ffffff;
   }
 
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+  }
 }
 
 /* ========================= */
 /*   CUSTOM CURSOR           */
 /* ========================= */
 .cursor {
-  width: 12px;
-  height: 12px;
-  background: var(--accent);
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 0 0 1px #000000, 0 0 8px rgba(255, 51, 0, 0.8);
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 2px solid var(--accent);
+  box-shadow: none;
   border-radius: 50%;
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 99999;
+  z-index: 999999;
   transform: translate(-50%, -50%);
-  transition: width 0.2s ease, height 0.2s ease, background 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+  transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
 }
 
 .cursor.hover {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 51, 0, 0.15);
-  border: 2.5px solid var(--accent);
-  box-shadow: 0 0 0 1.5px #ffffff, 0 0 12px rgba(255, 51, 0, 0.5);
+  width: 48px;
+  height: 48px;
+  background: transparent;
+  border: 2px solid var(--accent);
+  box-shadow: none;
 }
 
 /* ========================= */
@@ -126,7 +171,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem 2.5rem;
+  padding: 3.5rem 2.5rem;
   transition: background 0.4s ease, padding 0.4s ease;
 }
 
@@ -134,7 +179,7 @@
   background: var(--bg-overlay);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  padding: 1rem 2.5rem;
+  padding: 2rem 2.5rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -247,25 +292,41 @@
 
 .hero-name {
   font-family: var(--font-display);
-  font-size: clamp(5rem, 18vw, 22rem);
-  line-height: 0.88;
-  letter-spacing: -0.01em;
+  font-size: clamp(3rem, 9vw, 9rem);
+  line-height: 0.8;
+  letter-spacing: 0em;
   color: var(--white);
   text-transform: uppercase;
-  pointer-events: none;
   user-select: none;
+  text-align: center;
+  cursor: default;
+  transform: scaleY(2.2);
+  transform-origin: center;
+  padding: 2rem 0;
 }
 
 .hero-name span {
   display: inline-block;
-  transform: translateY(110%);
+  transform: translateY(40px);
+  transform-origin: bottom center;
   opacity: 0;
-  transition: transform 1s var(--ease-out-expo), opacity 0.6s ease;
+  transition: transform 1s var(--ease-out-expo), opacity 0.8s ease;
 }
 
 .hero-name span.visible {
   transform: translateY(0);
   opacity: 1;
+}
+
+.hero-name span.ready {
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  will-change: transform;
+  position: relative;
+}
+
+.hero-name span.ready:hover {
+  transform: translateY(-6px) scaleX(1.05);
+  z-index: 10;
 }
 
 .hero-sub-row {
@@ -901,7 +962,7 @@ textarea.form-control {
   color: #fff;
   transform-origin: center bottom !important;
   will-change: transform;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
 }
 
 .sticky-card-col {
@@ -949,7 +1010,6 @@ textarea.form-control {
   width: 100%;
   max-width: 100%;
   height: 100svh;
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1065,7 +1125,6 @@ textarea.form-control {
   height: 70%;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   background-color: #121212;
   cursor: none !important;
   will-change: transform, opacity, clip-path;
@@ -1082,6 +1141,9 @@ textarea.form-control {
 }
 
 .smooth-slide-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   transform: scale(1.5);
   opacity: 0.8;
   will-change: transform;
@@ -1108,12 +1170,12 @@ textarea.form-control {
   width: 100%;
   text-align: center;
   color: #ffffff !important;
-  font-size: clamp(36px, 8vw, 80px);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: clamp(14px, 2vw, 32px);
+  font-weight: 500;
+  text-transform: lowercase;
+  letter-spacing: 0.20em;
   line-height: 0.9;
-  font-family: var(--font-display) !important;
+  font-family: 'Satoshi', system-ui, sans-serif !important;
   text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
@@ -1158,30 +1220,30 @@ textarea.form-control {
 }
 
 .smooth-slider-items p {
-  font-family: var(--font-body) !important;
-  font-size: 11px;
-  font-weight: 600;
+  font-family: 'Satoshi', system-ui, sans-serif !important;
+  font-size: 0.65rem;
+  font-weight: 500;
   text-transform: uppercase;
   color: rgba(0, 0, 0, 0.35) !important;
   cursor: none !important;
   transition: color 0.4s ease;
   user-select: none;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.22em;
   line-height: 1.3;
 }
 
 .smooth-slider-items p.activeItem {
-  color: var(--accent) !important;
-  font-weight: 700;
+  color: #000000 !important;
+  font-weight: 500;
 }
 
 .smooth-slider-items p:hover {
-  color: var(--accent) !important;
+  color: #000000 !important;
 }
 
 @media (max-width: 900px) {
   .smooth-slide-container {
-    top: 45%;
+    top: 50%;
     width: 65%;
     height: 50%;
   }

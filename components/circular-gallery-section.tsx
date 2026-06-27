@@ -414,8 +414,14 @@ export default function CircularGallerySection() {
         cursor: isPreviewActive.current ? "zoom-out" : "default",
       }}
     >
-      <div className="gallery-container">
-        <div className="gallery-circle">
+      <div style={{ position: "absolute", top: "0rem", left: "5%", zIndex: 0, pointerEvents: "none" }}>
+        <p className="section-label reveal">Gallery</p>
+        <h2 className="section-title reveal reveal-delay-1" style={{ marginTop: "1rem" }}>
+          Photos
+        </h2>
+      </div>
+      <div className="gallery-container" style={{ marginBottom: "0rem" }}>
+        <div className="gallery-circle" style={{ marginTop: "12rem" }}>
           {Array.from({ length: config.imageCount }).map((_, i) => {
             const item = collection[i % 20]
             return (

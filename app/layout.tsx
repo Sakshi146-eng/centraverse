@@ -1,7 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, DM_Mono, Bebas_Neue, Montserrat } from "next/font/google"
+import { Inter, DM_Mono, Bebas_Neue, Montserrat, Instrument_Serif } from "next/font/google"
 import "./globals.css"
+// Trigger hot reload
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument",
+  display: "swap",
+})
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,12 +50,8 @@ export const metadata: Metadata = {
     type: "website",
   },
   icons: {
-    icon: [
-      { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
-      { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
 }
 
@@ -56,7 +61,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${dmMono.variable} ${bebasNeue.variable} ${montserrat.variable}`}
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${dmMono.variable} ${bebasNeue.variable} ${montserrat.variable} ${instrumentSerif.variable}`}
       style={{
         "--font-display": "var(--font-bebas)",
         "--font-body": "var(--font-inter)",

@@ -19,6 +19,7 @@ export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) =
     const spans = el.querySelectorAll<HTMLSpanElement>("span[data-char]")
     spans.forEach((span, i) => {
       setTimeout(() => span.classList.add("visible"), 100 + i * 60)
+      setTimeout(() => span.classList.add("ready"), 1000 + i * 60)
     })
   }, [])
 
@@ -26,9 +27,9 @@ export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) =
   const surname = "SHETTY"
 
   return (
-    <section className="hero" id="home" style={{ paddingTop: "5rem" }}>
+    <section className="hero" id="home" style={{ paddingTop: "8rem" }}>
       {/* Big name — ameer.com style */}
-      <div ref={nameRef} style={{ overflow: "hidden" }}>
+      <div ref={nameRef} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
         <div className="hero-name" aria-label="Shreyas Shetty">
           {name.split("").map((ch, i) => (
             <span key={i} data-char style={{ transitionDelay: `${i * 0.06}s` }}>
@@ -37,7 +38,7 @@ export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) =
           ))}
           <br />
           {surname.split("").map((ch, i) => (
-             <span key={i} data-char style={{ transitionDelay: `${(name.length + i) * 0.06}s`, color: "rgba(0,0,0,0.18)" }}>
+            <span key={i} data-char style={{ transitionDelay: `${(name.length + i) * 0.06}s`, color: "rgba(0,0,0,0.18)" }}>
               {ch}
             </span>
           ))}

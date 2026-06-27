@@ -127,20 +127,20 @@ export default function SplashScreen({ onDone }: { onDone?: () => void }) {
 
         .loader-1 {
           position: relative;
-          background: #ff3300;
+          background: #000000;
           width: 100px;
         }
 
         .loader-2 {
           position: relative;
           width: 100px;
-          background: #ff3300;
+          background: #000000;
         }
 
         .loader-3 {
           position: relative;
           width: 100px;
-          background: #ff3300;
+          background: #000000;
         }
 
         .bar {

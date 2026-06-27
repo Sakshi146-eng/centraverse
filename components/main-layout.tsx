@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { createPortal } from "react-dom"
 import Header from "@/components/header"
 import HeroSection from "@/components/hero-section"
 import AboutSection from "@/components/about-section"
-import EditsSection from "@/components/edits-section"
 import StickyCardsSection from "@/components/sticky-cards-section"
 import CircularGallerySection from "@/components/circular-gallery-section"
 import SmoothSliderSection from "@/components/smooth-slider-section"
@@ -13,12 +13,17 @@ import ContactSection from "@/components/contact-section"
 export default function MainLayout({ splashDone }: { splashDone: boolean }) {
   const [activeSection, setActiveSection] = useState("home")
   const [isHover, setIsHover] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const cursorRef = useRef<HTMLDivElement>(null)
 
   const scrollToSection = useCallback((sectionId: string) => {
     setActiveSection(sectionId)
     const element = document.getElementById(sectionId)
     if (element) element.scrollIntoView({ behavior: "smooth" })
+  }, [])
+
+  useEffect(() => {
+    setMounted(true)
   }, [])
 
   // Custom cursor
@@ -53,7 +58,7 @@ export default function MainLayout({ splashDone }: { splashDone: boolean }) {
       window.removeEventListener("mousemove", onMove)
       document.removeEventListener("mouseover", onOver)
     }
-  }, [])
+  }, [mounted]) // Re-run effect when mounted changes because cursorRef gets attached
 
   // Global scroll reveal IntersectionObserver + MutationObserver for dynamic elements
   useEffect(() => {
@@ -111,38 +116,38 @@ export default function MainLayout({ splashDone }: { splashDone: boolean }) {
   }, [])
 
   return (
-    <div className="main-bg-container" style={{ color: "var(--white)", minHeight: "100vh" }}>
-      {/* Custom cursor */}
-      <div
-        ref={cursorRef}
-        className={`cursor ${isHover ? "hover" : ""}`}
-      />
+    <>
+      {mounted && createPortal(
+        <div
+          ref={cursorRef}
+          className={`cursor ${isHover ? "hover" : ""}`}
+        />,
+        document.body
+      )}
+      <div className="main-bg-container" style={{ color: "var(--white)", minHeight: "100vh" }}>
+        <Header activeSection={activeSection} onNavigate={scrollToSection} />
 
-      <Header activeSection={activeSection} onNavigate={scrollToSection} />
-
-      <main>
-        <section id="home">
-          <HeroSection onNavigate={scrollToSection} />
-        </section>
-        <section id="about">
-          <AboutSection />
-        </section>
-        <section id="edits">
-          <EditsSection />
-        </section>
-        <section id="sticky-cards">
-          <StickyCardsSection />
-        </section>
-        <section id="circular-gallery">
-          <CircularGallerySection />
-        </section>
-        <section id="smooth-slider">
-          <SmoothSliderSection />
-        </section>
-        <section id="contact">
-          <ContactSection onNavigate={scrollToSection} />
-        </section>
-      </main>
-    </div>
+        <main>
+          <section id="home">
+            <HeroSection onNavigate={scrollToSection} />
+          </section>
+          <section id="about">
+            <AboutSection />
+          </section>
+          <section id="edits">
+            <StickyCardsSection />
+          </section>
+          <section id="circular-gallery">
+            <CircularGallerySection />
+          </section>
+          <section id="smooth-slider">
+            <SmoothSliderSection />
+          </section>
+          <section id="contact">
+            <ContactSection onNavigate={scrollToSection} />
+          </section>
+        </main>
+      </div>
+    </>
   )
 }

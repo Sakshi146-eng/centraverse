@@ -8,7 +8,9 @@ export default function Home() {
   const [splashDone, setSplashDone] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => { 
+    setMounted(true) 
+  }, [])
 
   const handleDone = useCallback(() => {
     setSplashDone(true)
