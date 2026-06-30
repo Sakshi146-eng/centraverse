@@ -273,7 +273,7 @@ export default function SmoothSliderSection() {
   }, [isMobile])
 
   return (
-    <div ref={sectionRef} className="smooth-slider-section" style={{ position: "relative", marginTop: "8rem", marginBottom: "4rem" }}>
+    <div id="smooth-slider" ref={sectionRef} className="smooth-slider-section" style={{ position: "relative", marginTop: "8rem", marginBottom: "4rem" }}>
       <div style={{ position: "absolute", top: "0rem", left: "5%", zIndex: 10, pointerEvents: "none" }}>
         <p className="section-label reveal">Graphic Design</p>
         <h2 className="section-title reveal reveal-delay-1" style={{ marginTop: "1rem" }}>

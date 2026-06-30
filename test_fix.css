@@ -1,0 +1,11 @@
+.animate-text::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: inherit;
+  color: #fff;
+  clip-path: inset(0 0 var(--clip-value) 0);
+  will-change: clip-path;
+}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { ArrowDown } from "lucide-react"
+import gsap from "gsap"
 
 const marqueeItems = [
   "Video Editing", "Motion Design", "Colour Grading",
@@ -11,6 +12,7 @@ const marqueeItems = [
 
 export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) => void }) {
   const nameRef = useRef<HTMLDivElement>(null)
+  const spanCenters = useRef<number[]>([])
 
   // Character reveal on mount
   useEffect(() => {
@@ -23,22 +25,70 @@ export default function HeroSection({ onNavigate }: { onNavigate?: (s: string) =
     })
   }, [])
 
+  const handleCharEnter = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const span = e.currentTarget
+    if (span.classList.contains("ready")) {
+      gsap.to(span, { 
+        scaleY: 1.4, 
+        duration: 0.1, 
+        overwrite: "auto", 
+        ease: "power2.out",
+        transformOrigin: "bottom"
+      })
+    }
+  }
+
+  const handleCharLeave = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const span = e.currentTarget
+    gsap.to(span, { 
+      scaleY: 1, 
+      duration: 0.3, 
+      overwrite: "auto", 
+      ease: "power2.out" 
+    })
+  }
+
   const name = "SHREYAS"
   const surname = "SHETTY"
 
   return (
     <section className="hero" id="home" style={{ paddingTop: "8rem" }}>
-      {/* Big name — ameer.com style */}
-      <div ref={nameRef} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-        <div className="hero-name" aria-label="Shreyas Shetty">
+      {/* Big name */}
+      <div 
+        ref={nameRef} 
+        style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", width: "100%" }}
+      >
+        <div 
+          className="hero-name" 
+          aria-label="Shreyas Shetty" 
+          style={{ 
+            textAlign: "left", 
+            fontFamily: "var(--font-display), sans-serif", 
+            fontStyle: "normal",
+            transform: "scaleY(1)", 
+            letterSpacing: "0.1em" 
+          }}
+        >
           {name.split("").map((ch, i) => (
-            <span key={i} data-char style={{ transitionDelay: `${i * 0.06}s` }}>
+            <span 
+              key={i} 
+              data-char 
+              style={{ transitionDelay: `${i * 0.06}s` }}
+              onMouseEnter={handleCharEnter}
+              onMouseLeave={handleCharLeave}
+            >
               {ch}
             </span>
           ))}
           <br />
           {surname.split("").map((ch, i) => (
-            <span key={i} data-char style={{ transitionDelay: `${(name.length + i) * 0.06}s`, color: "rgba(0,0,0,0.18)" }}>
+            <span 
+              key={i} 
+              data-char 
+              style={{ transitionDelay: `${(name.length + i) * 0.06}s`, color: "rgba(0,0,0,0.18)" }}
+              onMouseEnter={handleCharEnter}
+              onMouseLeave={handleCharLeave}
+            >
               {ch}
             </span>
           ))}

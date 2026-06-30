@@ -6,7 +6,11 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, X, Mail, Instagram, Youtube, Linkedin } from 'lucide-react';
-import { ContactCanvas } from './contact-canvas';
+import dynamic from 'next/dynamic';
+
+const ContactCanvas = dynamic(() => import('./contact-canvas').then((mod) => mod.ContactCanvas), {
+  ssr: false,
+});
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -482,7 +486,7 @@ export default function ContactSection({ onNavigate }: ContactProps) {
       >
         {/* Constellation background */}
         <div className="absolute inset-0 pointer-events-none z-0" aria-hidden>
-          <ContactCanvas />
+          {sectionInView && <ContactCanvas />}
         </div>
 
         <div className="relative z-10 w-full max-w-[1600px] mx-auto px-[clamp(1.25rem,5vw,5rem)] pt-[clamp(5rem,10vw,11rem)] pb-0 flex-1 flex flex-col">
@@ -691,7 +695,7 @@ export default function ContactSection({ onNavigate }: ContactProps) {
 
           {/* Big background wordmark removed */}
 
-          <div className="relative z-10 max-w-[1600px] mx-auto px-[clamp(1.25rem,5vw,5rem)] pb-[clamp(3rem,5vw,5rem)] pt-0">
+          <div className="relative z-10 max-w-[1600px] mx-auto px-[clamp(1.25rem,5vw,5rem)] pb-12 pt-0">
 
             {/* Top row: socials */}
             <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-end gap-6 sm:gap-8 mb-10 sm:mb-12">

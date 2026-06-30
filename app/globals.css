@@ -107,10 +107,11 @@
     background-attachment: fixed !important;
   }
 
-  body {
+  html, body {
     color: var(--white);
     font-family: var(--font-body);
     overflow-x: hidden;
+    max-width: 100vw;
     cursor: none;
   }
 
@@ -291,7 +292,7 @@
 }
 
 .hero-name {
-  font-family: var(--font-display);
+  font-family: var(--font-instrument), serif;
   font-size: clamp(3rem, 9vw, 9rem);
   line-height: 0.8;
   letter-spacing: 0em;
@@ -319,14 +320,9 @@
 }
 
 .hero-name span.ready {
-  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   will-change: transform;
   position: relative;
-}
-
-.hero-name span.ready:hover {
-  transform: translateY(-6px) scaleX(1.05);
-  z-index: 10;
+  /* Removed CSS transition/hover so JS can take over */
 }
 
 .hero-sub-row {
@@ -1435,4 +1431,25 @@ textarea.form-control {
   .logoloop__node {
     transition: none !important;
   }
+}
+
+/* About Section Text Reveal Animation */
+.animate-text {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  color: #4f4f4f;
+  --clip-value: 100%;
+}
+
+.animate-text::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: inherit;
+  color: #fff;
+  clip-path: inset(0 0 var(--clip-value) 0);
+  will-change: clip-path;
 }

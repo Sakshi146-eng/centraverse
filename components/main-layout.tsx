@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import Header from "@/components/header"
 import HeroSection from "@/components/hero-section"
 import AboutSection from "@/components/about-section"
+import ToolsSection from "@/components/tools-section"
 import StickyCardsSection from "@/components/sticky-cards-section"
 import CircularGallerySection from "@/components/circular-gallery-section"
 import SmoothSliderSection from "@/components/smooth-slider-section"
@@ -124,28 +125,17 @@ export default function MainLayout({ splashDone }: { splashDone: boolean }) {
         />,
         document.body
       )}
-      <div className="main-bg-container" style={{ color: "var(--white)", minHeight: "100vh" }}>
+      <div className="main-bg-container overflow-x-hidden w-full max-w-[100%]" style={{ color: "var(--white)", minHeight: "100vh" }}>
         <Header activeSection={activeSection} onNavigate={scrollToSection} />
 
         <main>
-          <section id="home">
-            <HeroSection onNavigate={scrollToSection} />
-          </section>
-          <section id="about">
-            <AboutSection />
-          </section>
-          <section id="edits">
-            <StickyCardsSection />
-          </section>
-          <section id="circular-gallery">
-            <CircularGallerySection />
-          </section>
-          <section id="smooth-slider">
-            <SmoothSliderSection />
-          </section>
-          <section id="contact">
-            <ContactSection onNavigate={scrollToSection} />
-          </section>
+          <HeroSection onNavigate={scrollToSection} />
+          <AboutSection />
+          <ToolsSection />
+          <StickyCardsSection />
+          <CircularGallerySection />
+          <SmoothSliderSection />
+          <ContactSection onNavigate={scrollToSection} />
         </main>
       </div>
     </>

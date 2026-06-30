@@ -407,6 +407,7 @@ export default function CircularGallerySection() {
 
   return (
     <div
+      id="circular-gallery"
       ref={containerRef}
       className="circular-gallery-section"
       onClick={handleResetGallery}
@@ -414,7 +415,7 @@ export default function CircularGallerySection() {
         cursor: isPreviewActive.current ? "zoom-out" : "default",
       }}
     >
-      <div style={{ position: "absolute", top: "0rem", left: "5%", zIndex: 0, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", top: "5rem", left: "5%", zIndex: 0, pointerEvents: "none" }}>
         <p className="section-label reveal">Gallery</p>
         <h2 className="section-title reveal reveal-delay-1" style={{ marginTop: "1rem" }}>
           Photos

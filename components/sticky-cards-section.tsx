@@ -160,7 +160,7 @@ export default function StickyCardsSection() {
   }, [])
 
   return (
-    <div ref={triggerRef} className="sticky-cards-trigger" style={{ width: "100%", position: "relative", paddingTop: "5rem" }}>
+    <div id="edits" ref={triggerRef} className="sticky-cards-trigger" style={{ width: "100%", position: "relative", paddingTop: "5rem" }}>
       <div style={{ position: "absolute", top: "0rem", left: "5%", zIndex: 10 }}>
         <p className="section-label reveal">Selected works</p>
         <h2 className="section-title reveal reveal-delay-1" style={{ marginTop: "1rem" }}>
