@@ -214,21 +214,21 @@ export default function ToolsSection() {
 
               <div className="title-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center mt-10 md:mt-20" style={{ zIndex: 1 }}>
                 <h1 style={{ color: '#cccccc', fontFamily: "'Satoshi', system-ui, sans-serif", lineHeight: '0.9' }} className="w-full text-left">
-                  <span className="block" style={{ fontWeight: 400, fontSize: 'clamp(1rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'lowercase' }}>{tool.prefix}</span>
+                  <span className="block" style={{ fontWeight: 400, fontSize: 'clamp(1rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'capitalize' }}>{tool.prefix}</span>
                   <span className="block" style={{ fontWeight: 800, fontSize: 'clamp(1.75rem, 7vw, 6.5rem)', letterSpacing: '-0.03em', textTransform: 'uppercase' }}>{tool.name}</span>
                 </h1>
               </div>
 
               <div className="title-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center mt-10 md:mt-20" style={{ zIndex: 2 }}>
                 <h1 style={{ color: '#ffffff', fontFamily: "'Satoshi', system-ui, sans-serif", lineHeight: '0.9' }} className="w-full text-left">
-                  <span className="block" style={{ fontWeight: 400, fontSize: 'clamp(0.75rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'lowercase' }}>{tool.prefix}</span>
+                  <span className="block" style={{ fontWeight: 400, fontSize: 'clamp(0.75rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'capitalize' }}>{tool.prefix}</span>
                   <span className="block" style={{ fontWeight: 800, fontSize: 'clamp(1.5rem, 7vw, 6.5rem)', letterSpacing: '-0.03em', textTransform: 'uppercase' }}>{tool.name}</span>
                 </h1>
               </div>
 
               <div className="title-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center mt-10 md:mt-20" style={{ zIndex: 3 }}>
                 <h1 style={{ color: '#111111', fontFamily: "'Satoshi', system-ui, sans-serif", lineHeight: '0.9' }} className="w-full text-left">
-                  <span className="block" style={{ color: '#888888', fontWeight: 400, fontSize: 'clamp(0.75rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'lowercase' }}>{tool.prefix}</span>
+                  <span className="block" style={{ color: '#888888', fontWeight: 400, fontSize: 'clamp(0.75rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'capitalize' }}>{tool.prefix}</span>
                   <span className="block" style={{ fontWeight: 800, fontSize: 'clamp(1.5rem, 7vw, 6.5rem)', letterSpacing: '-0.03em', textTransform: 'uppercase' }}>{tool.name}</span>
                 </h1>
               </div>

@@ -32,6 +32,7 @@ export default function SmoothSliderSection() {
   const totalSlides = 8
 
   const [isMobile, setIsMobile] = useState(false)
+  const [selectedPoster, setSelectedPoster] = useState<SlideItem | null>(null)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 900)
@@ -218,6 +219,8 @@ export default function SmoothSliderSection() {
           transitionSlides("next")
         } else if (clickedSlide.classList.contains("prev")) {
           transitionSlides("prev")
+        } else if (clickedSlide.classList.contains("active")) {
+          setSelectedPoster(sliderContent[activeSlideIndex.current - 1])
         }
       }
     }
@@ -323,6 +326,57 @@ export default function SmoothSliderSection() {
           ))}
         </div>
       </div>
+
+      {/* Fullscreen Overlay */}
+      {selectedPoster && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 999999,
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "2rem",
+            backdropFilter: "blur(10px)",
+            cursor: "zoom-out"
+          }}
+          onClick={() => setSelectedPoster(null)}
+        >
+          <img
+            src={selectedPoster.img}
+            alt={selectedPoster.name}
+            style={{
+              maxHeight: "90vh",
+              maxWidth: "90vw",
+              objectFit: "contain",
+              borderRadius: "8px",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+              cursor: "default"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            onClick={() => setSelectedPoster(null)}
+            style={{
+              position: "absolute",
+              top: "2rem",
+              right: "2rem",
+              background: "none",
+              border: "none",
+              color: "#fff",
+              fontSize: "1rem",
+              letterSpacing: "0.1em",
+              cursor: "pointer",
+              fontFamily: "var(--font-mono)",
+              textTransform: "uppercase"
+            }}
+          >
+            CLOSE
+          </button>
+        </div>
+      )}
     </div>
   )
 }
