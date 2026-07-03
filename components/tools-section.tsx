@@ -146,7 +146,7 @@ export default function ToolsSection() {
 
 
   return (
-    <section ref={containerRef} className="relative w-full z-10">
+    <section ref={containerRef} className="relative w-full z-10" id="tools">
       <div className="top-0 left-0 w-full h-screen overflow-hidden flex items-center pin-tools-container relative">
 
         {/* 3D Flying Images Background */}

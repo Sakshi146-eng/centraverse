@@ -102,13 +102,13 @@ export default function MainLayout({ splashDone }: { splashDone: boolean }) {
 
   // Section observer
   useEffect(() => {
-    const ids = ["home", "about", "edits", "contact"]
+    const ids = ["home", "about", "tools", "edits", "circular-gallery", "smooth-slider", "contact"]
     const observers = ids.map((id) => {
       const el = document.getElementById(id)
       if (!el) return null
       const obs = new IntersectionObserver(
         ([entry]) => { if (entry.isIntersecting) setActiveSection(id) },
-        { threshold: 0.3 }
+        { rootMargin: "-30% 0px -30% 0px" }
       )
       obs.observe(el)
       return obs

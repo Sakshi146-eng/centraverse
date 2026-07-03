@@ -6,7 +6,10 @@ import { Menu, X } from "lucide-react"
 const navItems = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
-  { id: "edits", label: "Edit" },
+  { id: "tools", label: "Tools" },
+  { id: "edits", label: "Edits" },
+  { id: "circular-gallery", label: "Gallery" },
+  { id: "smooth-slider", label: "Posters" },
   { id: "contact", label: "Contact" },
 ]
 
@@ -81,6 +84,7 @@ export default function Header({ activeSection, onNavigate }: HeaderProps) {
           <a
             key={item.id}
             href={`#${item.id}`}
+            className={activeSection === item.id ? "active" : ""}
             onClick={(e) => { e.preventDefault(); handleNav(item.id) }}
           >
             {item.label}

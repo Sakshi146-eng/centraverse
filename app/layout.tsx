@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, DM_Mono, Bebas_Neue, Montserrat, Instrument_Serif } from "next/font/google"
 import "./globals.css"
-// Trigger hot reload
+// Trigger hot reload 2
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
