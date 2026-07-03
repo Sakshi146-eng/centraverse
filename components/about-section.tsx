@@ -124,14 +124,14 @@ export default function AboutSection() {
 
         {/* Image & First Paragraph Layout */}
         <div className="w-full max-w-[85vw] mx-auto px-4 md:px-10 flex flex-col md:flex-row items-center md:items-start gap-12 md:gap-16 relative z-20">
-          
+
           {/* Left: WebGL Hover Photo Displacement */}
           <div className="w-full md:w-[35%] flex-shrink-0">
             <div className="w-full max-w-[350px] mx-auto md:mx-0 relative">
-              <HoverImageDisplacement 
-                image1="/placeholder-1.jpg" 
+              <HoverImageDisplacement
+                image1="/placeholder-1.jpg"
                 image2="/logo3.png"
-                displacementImage="/effect-image.jpg"
+                displacementImage="/placeholder-1.jpg"
                 intensity={0.6}
                 image2Mode="contain"
                 image2Background={[0.07, 0.07, 0.07]} // Dark background for the logo
@@ -152,7 +152,7 @@ export default function AboutSection() {
               I'm Shreyas Shetty — founder of Centraverse, short for "Centorian Cinematic Universe". The word Centaurian comes from my sun sign Sagittarius, symbolised by the centaur: a blend of instinct, creativity, and constant pursuit of growth.
             </h1>
           </div>
-          
+
         </div>
       </div>
 

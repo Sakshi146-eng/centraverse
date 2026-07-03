@@ -107,7 +107,8 @@
     background-attachment: fixed !important;
   }
 
-  html, body {
+  html,
+  body {
     color: var(--white);
     font-family: var(--font-body);
     overflow-x: hidden;
@@ -449,7 +450,7 @@
 
 .section-title {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, 8rem);
+  font-size: clamp(2rem, 8vw, 8rem);
   line-height: 0.9;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -1129,6 +1130,13 @@ textarea.form-control {
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .smooth-slide-container {
+    width: 60%;
+    height: 60%;
+  }
+}
+
 .smooth-slide-img {
   position: absolute;
   width: 100%;
@@ -1378,20 +1386,16 @@ textarea.form-control {
 
 .logoloop--fade::before {
   left: 0;
-  background: linear-gradient(
-    to right,
-    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to right,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+      rgba(0, 0, 0, 0) 100%);
 }
 
 .logoloop--fade::after {
   right: 0;
-  background: linear-gradient(
-    to left,
-    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to left,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+      rgba(0, 0, 0, 0) 100%);
 }
 
 .logoloop--vertical.logoloop--fade::before,
@@ -1405,21 +1409,17 @@ textarea.form-control {
 .logoloop--vertical.logoloop--fade::before {
   top: 0;
   bottom: auto;
-  background: linear-gradient(
-    to bottom,
-    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to bottom,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+      rgba(0, 0, 0, 0) 100%);
 }
 
 .logoloop--vertical.logoloop--fade::after {
   bottom: 0;
   top: auto;
-  background: linear-gradient(
-    to top,
-    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to top,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+      rgba(0, 0, 0, 0) 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

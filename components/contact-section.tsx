@@ -523,7 +523,7 @@ export default function ContactSection({ onNavigate }: ContactProps) {
                     color: '#f5f5f5',
                     fontFamily: 'var(--font-display)',
                     fontWeight: 400,
-                    fontSize: 'clamp(3rem, 8vw, 8rem)'
+                    fontSize: 'clamp(2rem, 8vw, 8rem)'
                   }}
                 >
                   {emailText.split("").map((char, i) => (

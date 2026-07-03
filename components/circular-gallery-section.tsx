@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { Play, X } from "lucide-react"
 import gsap from "gsap"
 
 interface CollectionItem {

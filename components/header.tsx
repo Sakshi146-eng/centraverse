@@ -64,7 +64,7 @@ export default function Header({ activeSection, onNavigate }: HeaderProps) {
             display: "none",
             background: "none",
             border: "none",
-            color: "#fff",
+            color: "#1a1a1a",
             cursor: "none",
             padding: "0.25rem",
           }}

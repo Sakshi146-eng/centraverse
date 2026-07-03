@@ -14,24 +14,55 @@ const TOOLS = [
   { id: 4, prefix: '', name: 'CapCut' },
 ];
 
+const CARD_POSITIONS = [
+  { top: "30%", left: "55%" },
+  { top: "20%", left: "25%" },
+  { top: "50%", left: "10%" },
+  { top: "60%", left: "40%" },
+  { top: "30%", left: "30%" },
+  { top: "60%", left: "60%" },
+  { top: "20%", left: "50%" },
+  { top: "60%", left: "10%" },
+  { top: "20%", left: "40%" },
+  { top: "45%", left: "55%" },
+];
+
+const CARD_IMAGES = [
+  "/Adobe_Premiere_Pro.svg.png",
+  "/Adobe_Photoshop.png",
+  "/after-effects.svg",
+  "/adobe_illustrator-removebg-preview.png",
+  "/capcut-logo-removebg-preview.png",
+  "/Adobe_Premiere_Pro.svg.png",
+  "/Adobe_Photoshop.png",
+  "/after-effects.svg",
+  "/adobe_illustrator-removebg-preview.png",
+  "/capcut-logo-removebg-preview.png",
+];
+
 export default function ToolsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const titlesRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (!containerRef.current || !titlesRef.current) return;
-    
+
     const moveDistance = window.innerWidth * (TOOLS.length - 1);
 
     const ctx = gsap.context(() => {
+      const cards = containerRef.current!.querySelectorAll('.card');
+      gsap.set(cards, {
+        z: -50000,
+        scale: 0,
+      });
+
       ScrollTrigger.create({
         trigger: containerRef.current,
         pin: true,
         start: 'top top',
         end: `+=${window.innerHeight * 5}px`,
         pinSpacing: true,
-        scrub: 1, 
+        scrub: 1,
         onUpdate: (self) => {
           // Horizontal scroll the titles
           const xPosition = -moveDistance * self.progress;
@@ -42,11 +73,11 @@ export default function ToolsSection() {
           const normalizedVelocity = velocity / Math.abs(velocity) || 0;
           const maxOffset = 30; // Max horizontal pixel offset for the stretch
           const currentSpeed = Math.min(Math.abs(velocity / 500), maxOffset);
-          
+
           const isAtEdge = self.progress <= 0 || self.progress >= 1;
 
           const titleContainers = containerRef.current!.querySelectorAll('.title-container');
-          
+
           titleContainers.forEach((container) => {
             const title1 = container.querySelector('.title-1');
             const title2 = container.querySelector('.title-2');
@@ -89,6 +120,22 @@ export default function ToolsSection() {
               x: 0,
             });
           });
+
+          // 3D Cards flying effect
+          cards.forEach((card, index) => {
+            const staggerOffset = index * 0.075;
+            const scaledProgress = (self.progress - staggerOffset) * 3;
+            const individualProgress = Math.max(0, Math.min(1, scaledProgress));
+            const targetZ = index === cards.length - 1 ? 1500 : 2000;
+            const newZ = -50000 + (targetZ + 50000) * individualProgress;
+            const scaleProgress = Math.min(1, individualProgress * 10);
+            const scale = Math.max(0, Math.min(1, scaleProgress));
+
+            gsap.set(card, {
+              z: newZ,
+              scale: scale,
+            });
+          });
         }
       });
     });
@@ -96,40 +143,55 @@ export default function ToolsSection() {
     return () => ctx.revert();
   }, []);
 
-  // Intersection Observer for Video Play/Pause
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && videoRef.current) {
-          videoRef.current.defaultMuted = true;
-          videoRef.current.muted = true;
-          videoRef.current.play().catch(e => console.log("Autoplay prevented:", e));
-        } else if (!entry.isIntersecting && videoRef.current) {
-          videoRef.current.pause();
-        }
-      });
-    }, { threshold: 0.1 });
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <section ref={containerRef} className="relative w-full z-10">
       <div className="top-0 left-0 w-full h-screen overflow-hidden flex items-center pin-tools-container relative">
-        
-        {/* Background Video aligned slightly right */}
-        <video 
-          ref={videoRef}
-          autoPlay
-          muted 
-          loop 
-          playsInline 
-          className="absolute top-[60%] left-[80%] w-auto min-w-[20vw] h-[40vh] -translate-x-1/2 -translate-y-1/2 object-contain grayscale z-0 pointer-events-none"
-          src="/ani-Picsart-BackgroundRemover.mov"
-        />
+
+        {/* 3D Flying Images Background */}
+        <div
+          className="images"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '200vw',
+            height: '200vh',
+            transformStyle: 'preserve-3d',
+            perspective: '2000px',
+            zIndex: 0,
+            pointerEvents: 'none'
+          }}
+        >
+          {CARD_IMAGES.map((imgSrc, i) => (
+            <div
+              key={i}
+              className={`card card-${i + 1}`}
+              style={{
+                position: 'absolute',
+                width: '200px',
+                height: '250px',
+                borderRadius: '1.5em',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '20px',
+                transformStyle: 'preserve-3d',
+                willChange: 'transform',
+                overflow: 'hidden',
+                top: CARD_POSITIONS[i % CARD_POSITIONS.length].top,
+                left: CARD_POSITIONS[i % CARD_POSITIONS.length].left,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={imgSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+          ))}
+        </div>
 
         {/* Pinned Titles */}
         <div className="absolute top-20 left-10 md:left-20" style={{ zIndex: 50, pointerEvents: 'none' }}>
@@ -138,46 +200,43 @@ export default function ToolsSection() {
             Tools
           </h2>
         </div>
-        
+
         {/* Animated Words Track */}
-        <div 
+        <div
           ref={titlesRef}
           className="absolute top-0 left-0 h-screen flex will-change-transform"
           style={{ width: `${TOOLS.length * 100}vw` }}
         >
           {TOOLS.map((tool, index) => (
             <div key={tool.id} className="relative flex-1 h-full flex justify-center items-center title-container">
-              
-              {/* Vertical separator line */}
-              {index !== TOOLS.length - 1 && (
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-[40vh] mt-20 bg-black/10 z-10" />
-              )}
 
-              <div className="title-1 absolute top-1/2 left-[40%] -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center leading-tight gap-4 mt-20" style={{ zIndex: 1 }}>
-                <h1 style={{ color: '#cccccc', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontFamily: "'Satoshi', system-ui, sans-serif", letterSpacing: '4px' }} className="flex flex-col">
-                  <span style={{ fontWeight: 300 }}>{tool.prefix}</span> 
-                  <span style={{ fontWeight: 500 }}>{tool.name}</span>
+              {/* Vertical separator line removed */}
+
+              <div className="title-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center mt-10 md:mt-20" style={{ zIndex: 1 }}>
+                <h1 style={{ color: '#cccccc', fontFamily: "'Satoshi', system-ui, sans-serif", lineHeight: '0.9' }} className="w-full text-left">
+                  <span className="block" style={{ fontWeight: 400, fontSize: 'clamp(1rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'lowercase' }}>{tool.prefix}</span>
+                  <span className="block" style={{ fontWeight: 800, fontSize: 'clamp(1.75rem, 7vw, 6.5rem)', letterSpacing: '-0.03em', textTransform: 'uppercase' }}>{tool.name}</span>
                 </h1>
               </div>
-              
-              <div className="title-2 absolute top-1/2 left-[40%] -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center leading-tight gap-4 mt-20" style={{ zIndex: 2 }}>
-                <h1 style={{ color: '#ffffff', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontFamily: "'Satoshi', system-ui, sans-serif", letterSpacing: '4px' }} className="flex flex-col">
-                  <span style={{ fontWeight: 300 }}>{tool.prefix}</span> 
-                  <span style={{ fontWeight: 500 }}>{tool.name}</span>
+
+              <div className="title-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center mt-10 md:mt-20" style={{ zIndex: 2 }}>
+                <h1 style={{ color: '#ffffff', fontFamily: "'Satoshi', system-ui, sans-serif", lineHeight: '0.9' }} className="w-full text-left">
+                  <span className="block" style={{ fontWeight: 400, fontSize: 'clamp(0.75rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'lowercase' }}>{tool.prefix}</span>
+                  <span className="block" style={{ fontWeight: 800, fontSize: 'clamp(1.5rem, 7vw, 6.5rem)', letterSpacing: '-0.03em', textTransform: 'uppercase' }}>{tool.name}</span>
                 </h1>
               </div>
-              
-              <div className="title-3 absolute top-1/2 left-[40%] -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center leading-tight gap-4 mt-20" style={{ zIndex: 3 }}>
-                <h1 style={{ color: '#111111', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontFamily: "'Satoshi', system-ui, sans-serif", letterSpacing: '4px' }} className="flex flex-col">
-                  <span style={{ color: '#888888', fontWeight: 300 }}>{tool.prefix}</span> 
-                  <span style={{ fontWeight: 500 }}>{tool.name}</span>
+
+              <div className="title-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap will-change-transform flex flex-col items-start justify-center mt-10 md:mt-20" style={{ zIndex: 3 }}>
+                <h1 style={{ color: '#111111', fontFamily: "'Satoshi', system-ui, sans-serif", lineHeight: '0.9' }} className="w-full text-left">
+                  <span className="block" style={{ color: '#888888', fontWeight: 400, fontSize: 'clamp(0.75rem, 2.5vw, 2rem)', letterSpacing: 'normal', marginLeft: '0.12em', textTransform: 'lowercase' }}>{tool.prefix}</span>
+                  <span className="block" style={{ fontWeight: 800, fontSize: 'clamp(1.5rem, 7vw, 6.5rem)', letterSpacing: '-0.03em', textTransform: 'uppercase' }}>{tool.name}</span>
                 </h1>
               </div>
 
             </div>
           ))}
         </div>
-        
+
       </div>
     </section>
   );
